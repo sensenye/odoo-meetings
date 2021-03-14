@@ -1,0 +1,9 @@
+Server url
+localhost:8069
+
+Credentials
+user: admin pw: admin
+
+Run server
+cd /CommunityPath
+$ python3 odoo-bin --addons-path=addons -d mydb
