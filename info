@@ -6,4 +6,4 @@ user: admin pw: admin
 
 Run server
 cd /CommunityPath
-$ python3 odoo-bin --addons-path=addons -d mydb
+$ python3 odoo-bin --addons-path=addons,local-addons -d mydb
