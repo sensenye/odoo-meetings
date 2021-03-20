@@ -7,3 +7,9 @@ user: admin pw: admin
 Run server
 cd /CommunityPath
 $ python3 odoo-bin --addons-path=addons,local-addons -d mydb
+
+
+OSError: [Errno 98] Address already in use
+
+ps aux | grep python3
+sudo kill -9 processId (segunda columna)
