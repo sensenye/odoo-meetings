@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "odoo_meetings",
+    'name': "Odoo Meetings",
 
     'summary': """
         Manage meetings""",
 
     'description': """
-        Long description of module's purpose
+        The module will let companies manage more efficiently the meetings with the customers
     """,
 
     'author': "Sensen Ye",
-    'website': "http://www.yourcompany.com",
+    'website': "http://www.odoomeetings.com",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
