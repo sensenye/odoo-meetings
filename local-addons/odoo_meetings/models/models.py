@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# from odoo import models, fields, api
+from odoo import models, fields, api
 
+class Meetings(models.Model):
+    _name = 'odoo_meetings.meeting'
+    _description = "Reunion"
+
+    name = fields.Char(string="Title", required=True)
+    value = fields.Text()
 
 # class odoo_meetings(models.Model):
 #     _name = 'odoo_meetings.odoo_meetings'

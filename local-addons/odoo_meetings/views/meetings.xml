@@ -1,0 +1,44 @@
+<odoo>
+    <record model="ir.actions.act_window" id="odoo_meetings_list_action">
+      <field name="name">Reunion</field>
+      <field name="res_model">odoo_meetings.meeting</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create the first meeting
+                </p>
+            </field>
+    </record>
+
+     <record model="ir.ui.view" id="meeting_form_view">
+            <field name="name">meeting.form</field>
+            <field name="model">odoo_meetings.meeting</field>
+            <field name="arch" type="xml">
+                <form string="Meeting Form">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="value"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+            <!-- top level menu: no parent -->
+        <menuitem id="main_odoo_meetings_menu" name="Meetings" action="odoo_meetings_list_action"
+        sequence="-2"
+        groups="base.group_user"/>
+        <!-- A first level in the left side menu is needed
+             before using action= attribute -->
+        <menuitem id="odoo_meetings_menu" name="Reuniones"
+                  parent="main_odoo_meetings_menu"/>
+        <!-- the following menuitem should appear *after*
+             its parent openacademy_menu and *after* its
+             action course_list_action -->
+        <menuitem id="meetings_menu" name="Reuniones 2" parent="odoo_meetings_menu"
+                  action="odoo_meetings_list_action"/>
+        <!-- Full id location:
+             action="openacademy.course_list_action"
+             It is not required when it is the same module -->
+</odoo>
