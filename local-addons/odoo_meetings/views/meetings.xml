@@ -1,16 +1,6 @@
 <odoo>
-    <record model="ir.actions.act_window" id="odoo_meetings_list_action">
-      <field name="name">Reunion</field>
-      <field name="res_model">odoo_meetings.meeting</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="view_mode">tree,form</field>
-      <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">Create the first meeting
-                </p>
-            </field>
-    </record>
 
-     <record model="ir.ui.view" id="meeting_form_view">
+    <record model="ir.ui.view" id="meeting_form_view">
             <field name="name">meeting.form</field>
             <field name="model">odoo_meetings.meeting</field>
             <field name="arch" type="xml">
@@ -25,20 +15,132 @@
             </field>
         </record>
 
-            <!-- top level menu: no parent -->
-        <menuitem id="main_odoo_meetings_menu" name="Meetings" action="odoo_meetings_list_action"
-        sequence="-2"
-        groups="base.group_user"/>
-        <!-- A first level in the left side menu is needed
+    <record model="ir.ui.view" id="meeting_tree_view">
+        <field name="name">meeting.tree</field>
+        <field name="model">odoo_meetings.meeting_type</field>
+        <!-- <field name="view_mode">form</field> -->
+        <field name="arch" type="xml">
+            <form string="Meeting Tree view">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <!-- <field name="description"/>
+                        <field name="email"/>
+                        <field name="mobile"/> -->
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="meeting_kanban_view">
+        <field name="name">meeting.kanban</field>
+        <field name="model">odoo_meetings.meeting_type</field>
+        <!-- <field name="view_mode">form</field> -->
+        <field name="arch" type="xml">
+            <kanban class="o_res_partner_kanban">
+                <field name="name"/>
+                <field name="localization"/>
+                <!-- <field name="description"/>
+                <field name="email"/>
+                <field name="mobile"/> -->
+                <templates>
+                    <t t-name="kanban-box">
+                        <div>
+                            <!-- 
+                            When the card is clicked, the form view appears
+                            <div t-attf-class="oe_kanban_global_click">
+                        -->
+
+                            <!-- <div class="o_kanban_image">
+                                    <img alt="Avatar" t-att-src="kanban_image('res.partners', 'image_medium',record.id.raw_value)"/>
+                                </div> -->
+
+                            <div class="card-options-container">
+                                <!-- Top-right drop down menu here... -->
+                                <a class="o_kanban_manage_toggle_button" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-ellipsis-v"/>
+                                </a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                    <!-- Edit and Delete actions, if available: -->
+                                    <div t-if="widget.editable">
+                                        <li>
+                                            <a type="edit">Edit</a>
+                                        </li>
+                                        <li>
+                                            <a type="delete">Delete</a>
+                                        </li>
+                                    </div>
+                                </ul>
+                            </div>
+                            <div class="card-title">
+
+                                <field name="name"/>
+                                <p>
+                                    <field name="localization"/>
+                                </p>
+                                <!-- <div t-if="record.mobile.value">
+                                    <t t-esc="record.mobile.value"/>
+                                </div>
+                                <div t-if="record.email.value">
+                                    <t t-esc="record.email.value"/>
+                                </div> -->
+                                <div class="text-center pt-4">
+                                    <button class="btn btn-primary" name="open_calendar" type="object">
+                                    XXX Reuniones
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="odoo_meetings_form_action">
+        <field name="name">Reunion</field>
+        <field name="res_model">odoo_meetings.meeting_type</field>
+        <!-- <field name="type">ir.actions.act_window</field> -->
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="meeting_form_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first meeting
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="odoo_meetings_view_action">
+        <field name="name">Reunion</field>
+        <field name="res_model">odoo_meetings.meeting_type</field>
+        <!-- <field name="type">ir.actions.act_window</field> -->
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="meeting_tree_view"/>
+    </record>
+
+    <record model="ir.actions.act_window" id="odoo_meeting_type_kanban_action">
+        <field name="name">Odoo Meetings</field>
+        <field name="res_model">odoo_meetings.meeting_type</field>
+        <!-- <field name="type">ir.actions.act_window</field> -->
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="meeting_kanban_view"/>
+    </record>
+
+
+    <!-- top level menu: no parent -->
+
+    <!-- <menuitem id="main_odoo_meetings_menu" name="Meetings" action="odoo_meeting_type_kanban_action" sequence="-2" groups="base.group_user"/> -->
+
+    <!-- A first level in the left side menu is needed
              before using action= attribute -->
-        <menuitem id="odoo_meetings_menu" name="Reuniones"
-                  parent="main_odoo_meetings_menu"/>
-        <!-- the following menuitem should appear *after*
+    <menuitem id="odoo_meetings_menu" name="Tipos de reuniones" parent="calendar.mail_menu_calendar" action="odoo_meeting_type_kanban_action" />
+    <!-- the following menuitem should appear *after*
              its parent openacademy_menu and *after* its
              action course_list_action -->
-        <menuitem id="meetings_menu" name="Reuniones 2" parent="odoo_meetings_menu"
-                  action="odoo_meetings_list_action"/>
-        <!-- Full id location:
-             action="openacademy.course_list_action"
+    <!-- 
+        <menuitem id="meetings_menu" name="Reuniones 2" parent="odoo_meetings_menu" action="odoo_meetings_list_action"/>
+                   -->
+    <!-- Full id location: action="openacademy.course_list_action"
              It is not required when it is the same module -->
 </odoo>
