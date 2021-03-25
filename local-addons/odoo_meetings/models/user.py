@@ -2,12 +2,16 @@
 
 from odoo import models, fields, api
 
-class Meetings(models.Model):
-    _name = 'odoo_meetings.meeting'
-    _description = "Reunion"
+class User(models.Model):
+    _name = 'odoo_meetings.user'
+    _description = "User"
 
-    name = fields.Char(string="Title", required=True)
-    value = fields.Text()
+    name = fields.Char(string="Nombre", required=True)
+    email = fields.Char(string="Email", required=True)
+    password = fields.Char(string="Contraseña", required=True)
+    availability = fields.Char(string="Disponibilidad", required=True)
+    rol = fields.Char(string="Rol", required=True)
+    
 
 # class odoo_meetings(models.Model):
 #     _name = 'odoo_meetings.odoo_meetings'
