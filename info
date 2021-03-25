@@ -13,3 +13,6 @@ OSError: [Errno 98] Address already in use
 
 ps aux | grep python3
 sudo kill -9 processId (segunda columna)
+
+
+https://www.odoo.com/documentation/14.0/reference/actions.html#window-actions-ir-actions-act-window
