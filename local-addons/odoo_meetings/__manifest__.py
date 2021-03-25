@@ -21,7 +21,9 @@
     # any module necessary for this one to work correctly
     'depends': ['base','calendar'],
 
-    
+    # will appear on App menu
+    'application': True,
+
     # always loaded
     'data': [
         'security/ir.model.access.csv',
