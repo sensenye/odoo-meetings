@@ -25,7 +25,7 @@
                         <page string="Información general">
                             <group>
                                 <field name="name"/>
-                                <field name="localization" widget="selection"/>
+                                <field name="localization"/>
                                 <field name="description" widget="html"/>
                             </group>
                         </page>

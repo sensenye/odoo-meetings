@@ -7,8 +7,17 @@ class MeetingType(models.Model):
     _name = "odoo_meetings.meeting_type"
     _description = "Meeting Type"
 
+    # LOCALIZATION_STATES = [
+    #     ('physical', 'Físico'),
+    #     ('google_meet', 'Google Meet'),
+    # ]
+
     name = fields.Char(string="Tipo de reunión", required=True)
-    localization = fields.Char(string="Localización", required=True)
+    localization = fields.Selection([
+        ('physical', 'Físico'),
+        ('google_meet', 'Google Meet'),
+    ], default='google_meet', required=True)
+    # localization = fields.Char(string="Localización", required=True)
     description = fields.Char(string="Descripción", required=True)
     # employees =
     date_range = fields.Char(string="Rango", required=True)
@@ -17,7 +26,7 @@ class MeetingType(models.Model):
     url = fields.Char(string="URL", required=True)
     # localization_options = fields.Selection([
     #     ('normal', 'In Progress'),
-    #     ('done', 'Ready for next stage'), 
+    #     ('done', 'Ready for next stage'),
     #     ('blocked', 'Blocked')], string='State')
 
     def open_calendar(self):
