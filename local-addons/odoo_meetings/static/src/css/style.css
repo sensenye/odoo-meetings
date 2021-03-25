@@ -1,0 +1,41 @@
+.text-center {
+  text-align: center;
+}
+
+.meetings-btn {
+  /* background-color: #46456f;
+  margin-top: 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  line-height: 1.5;
+  vertical-align: middle; */
+
+  color: rgb(232, 230, 227);
+    background-color: rgb(70, 69, 111);
+    border-color: rgb(78, 85, 88);
+}
+
+.card-title span {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.card-title p span {
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+.card-options-container {
+  position: absolute;
+  top: 8px;
+  left: auto;
+  bottom: auto;
+  right: 8px;
+  margin: -8px -8px 0 0;
+  padding: 1rem 1rem 0rem 1rem;
+}
+
+.card-options-container a {
+  padding: 1rem 1rem 0rem 1rem;
+}

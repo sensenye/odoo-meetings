@@ -1,5 +1,16 @@
 <odoo>
     <data>
+    <!-- <template id="assets_frontend" name="account assets" inherit_id="web.assets_frontend">
+        <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
+            </xpath>
+    </template> -->
+
+    <template id="assets_frontend" name="account assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
+            </xpath>
+    </template>
 <!--
         <template id="listing">
           <ul>
