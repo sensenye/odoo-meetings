@@ -1,19 +1,47 @@
 <odoo>
 
+    <record id="view_calendar_event_search_external" model="ir.ui.view">
+        <field name="name">calendar.event.search.expand</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='mymeetings']" position="after">
+                <separator/>
+                <filter string="Odoo Meetings" help="Odoo Meetings" name="myodoomeetings" />
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
     <record model="ir.ui.view" id="meeting_form_view">
-            <field name="name">meeting.form</field>
-            <field name="model">odoo_meetings.meeting</field>
-            <field name="arch" type="xml">
-                <form string="Meeting Form">
-                    <sheet>
-                        <group>
-                            <field name="name"/>
-                            <field name="value"/>
-                        </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+        <field name="name">meeting.form</field>
+        <field name="model">odoo_meetings.meeting_type</field>
+        <!-- <field name="view_mode">form</field> -->
+        <field name="arch" type="xml">
+            <form string="Meeting Form">
+                <sheet>
+                    <h2>Añadir tipo de reunión</h2>
+                    <notebook>
+                        <page string="Información general">
+                            <group>
+                                <field name="name"/>
+                                <field name="localization" widget="selection"/>
+                                <field name="description" widget="html"/>
+                            </group>
+                        </page>
+                        <page string="Fechas, duración y límite">
+                            <group>
+                                <field name="date_range"/>
+                                <field name="duration"/>
+                                <field name="daily_limit"/>
+                                <field name="url"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
     <record model="ir.ui.view" id="meeting_tree_view">
         <field name="name">meeting.tree</field>
