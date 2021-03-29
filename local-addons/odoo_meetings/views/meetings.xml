@@ -81,7 +81,7 @@
                 <field name="mobile"/> -->
                 <templates>
                     <t t-name="kanban-box">
-                        <div>
+                        <div class="oe_kanban_global_click">
                             <!-- 
                             When the card is clicked, the form view appears
                             <div t-attf-class="oe_kanban_global_click">
@@ -99,12 +99,13 @@
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                     <!-- Edit and Delete actions, if available: -->
                                     <div t-if="widget.editable">
+                                   
                                         <li>
                                             <a type="edit">Edit</a>
                                         </li>
                                         <li>
                                             <a type="delete">Delete</a>
-                                        </li>
+                                        </li>   
                                     </div>
                                 </ul>
                             </div>
