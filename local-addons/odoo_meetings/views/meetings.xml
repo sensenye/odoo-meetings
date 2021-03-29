@@ -30,11 +30,18 @@
                             </group>
                         </page>
                         <page string="Fechas, duración y límite">
+                            <p>Los usuarios pueden programar reuniones:</p>
                             <group>
-                                <field name="date_range"/>
                                 <field name="duration"/>
                                 <field name="daily_limit"/>
-                                <field name="url"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                            </group>
+                        </page>
+                        <page string="Empleados">
+                            <p>Asigna empleados a este tipo de reunión creado:</p>
+                            <group>
+                                <field name="employees" widget="many2many"/>
                             </group>
                         </page>
                     </notebook>
