@@ -20,7 +20,7 @@ class MeetingType(models.Model):
     ], default='google_meet', required=True, string="Localización *")
     # localization = fields.Char(string="Localización", required=True)
     description = fields.Char(string="Descripción *", required=True)
-    employees = fields.Many2many('hr.employee.public', string="Empleado")
+    employees = fields.Many2many('hr.employee.public', string="Empleado", relation="odoo_meetings_meeting_type_employee_rel")
     # date_range = fields.Char(string="Rango", required=True)
     # date_range = fields.Selection([
     #     ('next_days', 'Dentro de los próximos'),
@@ -38,6 +38,9 @@ class MeetingType(models.Model):
     #     ('normal', 'In Progress'),
     #     ('done', 'Ready for next stage'),
     #     ('blocked', 'Blocked')], string='State')
+
+    def get_description(self):
+        return self.description
 
     def open_calendar(self):
         print("Hola")

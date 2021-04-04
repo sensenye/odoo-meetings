@@ -11,7 +11,8 @@ class Meeting(models.Model):
     comments = fields.Text(string="Comentarios", required=True)
     date = fields.Date(string="Fecha", required=True)
     hour = fields.Char(string="Hora", required=True)
-    state = fields.Char(string="Estado", required=True)
+    # state = fields.Char(string="Estado", required=True)
+    meeting_type = fields.Many2many('meeting_type', string="Tipo de reunión", relation="odoo_meetings_meeting_type_meeting_event_rel")
     
 
 # class odoo_meetings(models.Model):
