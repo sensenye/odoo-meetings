@@ -1,17 +1,24 @@
 <odoo>
-    <data>
+  <data>
     <!-- <template id="assets_frontend" name="account assets" inherit_id="web.assets_frontend">
         <xpath expr="." position="inside">
                 <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
             </xpath>
     </template> -->
 
-    <template id="assets_frontend" name="account assets" inherit_id="web.assets_backend">
-        <xpath expr="." position="inside">
-                <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
-            </xpath>
+    <template id="assets_frontend" name="account assets" inherit_id="web.assets_frontend">
+      <xpath expr="." position="inside">
+        <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
+        <script src="/odoo_meetings/static/src/js/show_description.js" type="text/javascript" />
+      </xpath>
     </template>
-<!--
+
+    <template id="assets_backend" name="account assets" inherit_id="web.assets_backend">
+      <xpath expr="." position="inside">
+        <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
+      </xpath>
+    </template>
+    <!--
         <template id="listing">
           <ul>
             <li t-foreach="objects" t-as="object">
@@ -31,5 +38,141 @@
           </dl>
         </template>
 -->
-    </data>
+
+    <!-- <template id="index">
+      <title>MeetingType</title>
+      <t t-foreach="meetingTypes" t-as="meetingType">
+        <p>
+          <p><t t-esc="meetingType.id"/> <t t-esc="meetingType.name"/></p>
+        </p>
+      </t>
+    </template> -->
+
+    <template id="index">
+      <t t-call="website.layout">
+        <t t-set="title">Odoo Meetings</t>
+        <div class="oe_structure">
+          <div class="container py-4">
+            <h2>Programar una reunión</h2>
+
+            <form action="/odoo-meetings/submit">
+
+
+              <div class="row">
+                <div class="col-lg-12">
+                  <p>Selecciona un tipo de reunión:</p>
+
+                  <t t-set="meetingTypeSelectedIndex" t-value="0"/>
+
+                  <select name="meetingTypeSelect" class="form-control" id="meetingTypeSelect" onchange="show_description(this)">
+                    <t t-foreach="meetingTypes" t-as="meetingType">
+                      <option>
+                        <t t-esc="meetingType.name"/>
+                        <!-- <t t-esc="meetingType_index"/> -->
+                      </option>
+                      <t t-set="meetingTypeSelectedIndex" t-value="5"/>
+                    </t>
+
+                  </select>
+
+                  <div id="meetingTypeDescription">
+                    <t t-foreach="meetingTypes" t-as="meetingType">
+                      <p t-if="meetingType_first" class="d-block">
+                        <t t-esc="meetingType.description"/>
+                      </p>
+                      <p t-else="meetingType_first" class="d-none">
+                        <t t-esc="meetingType.description"/>
+                      </p>
+                    </t>
+                  </div>
+
+
+                </div>
+
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label for="date" class="control-label">Fecha</label>
+                    <input type="date" name="date" min="2018-01-01" max="2018-12-31" required="required" class="form-control o_website_form_date" />
+                  </div>
+                  <div class="form-group">
+                    <label for="hour" class="control-label">Hora</label>
+                    <input type="text" name="hour" required="required"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="name" class="control-label">Nombre</label>
+                    <input type="text" name="name" required="required"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="email" class="control-label">Fecha</label>
+                    <input type="email" name="email" required="required"/>
+                  </div>
+                  <div class="form-group">
+                    <label for="comments" class="control-label">Comentarios</label>
+                    <input type="textarea" name="comments" required="required"/>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+              </div>
+            </form>
+
+
+
+            <!-- <t t-foreach="meetingTypes" t-as="meetingType">
+                <p>
+                  <t t-esc="meetingType.description"/>
+                  <div t-field="meetingType.start_date"/>
+                </p>
+              </t>             -->
+
+
+          </div>
+
+        </div>
+
+
+      </t>
+    </template>
+
+    <template id="select_time">
+      <t t-call="website.layout">
+        <t t-set="title">Odoo Meetings</t>
+        <div class="oe_structure">
+          <div class="container py-4">
+            <h2>Programar una reunión</h2>
+
+            <form action="/odoo-meetings/meeting-type/submit">
+              <div class="row">
+                <div class="col-lg-6">
+                  <p>Selecciona un tipo de reuniónn:</p>
+                  <select name="meetingTypeSelect" class="form-control">
+                    <t t-foreach="meetingTypes" t-as="meetingType">
+                      <option>
+                        <t t-esc="meetingType.name"/>
+                      </option>
+                    </t>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </t>
+    </template>
+
+
+    <template id="form_success" name="Form Successfully Submitted">
+      <t t-call="website.layout">
+        <div id="wrap">
+          <div class="container">
+            <div class="col-md-12">
+              <div class="alert alert-success">
+                            Customer created successfully.
+              </div>
+            </div>
+          </div>
+        </div>
+      </t>
+    </template>
+
+  </data>
 </odoo>
