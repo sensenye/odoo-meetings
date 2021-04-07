@@ -80,13 +80,13 @@
                       <p t-if="meetingType_first" class="d-block">
                         <t t-esc="meetingType.description"/>
                         <a t-attf-href="/odoo-meetings/#{meetingType.id}" class="btn btn-primary">
-                          Book Detail
+                          Siguiente
                         </a>
                       </p>
                       <p t-else="meetingType_first" class="d-none">
                         <t t-esc="meetingType.description"/>
                         <a t-attf-href="/odoo-meetings/#{meetingType.id}" class="btn btn-primary">
-                          Book Detail
+                          Siguiente
                         </a>
                       </p>
                     </t>
@@ -149,16 +149,64 @@
             <h2>Seleccionar fecha y hora</h2>
 
             <form action="/odoo-meetings/meeting-type/submit">
+              <!-- <div class="row">
+                <div class="col-lg-12">
+                  <p>Selecciona la fecha y hora que prefieras para el tipo de reunión "<t t-esc="meetingType.name"/>"</p>
+                  <p>
+                    <t t-esc="meetingType.duration"/>
+                  </p>
+                  <p>
+                    <t t-esc="meetingType.start_date"/>
+                  </p>
+                  <p>
+                    <t t-esc="meetingType.end_date"/>
+                  </p>
+                  <p>
+                    <t t-esc="meetingTypeId"/>
+                  </p>
+                  <t t-foreach="employees" t-as="employee">
+                    <p>
+                      <t t-esc="employee.id"/>
+                      <t t-esc="employee.name"/>
+                    </p>
+                  </t>
+                  <t t-foreach="resources" t-as="res">
+                    <p>
+                      <t t-esc="res.calendar_id.name"/>
+                      <t t-esc="employee.name"/>
+                    </p>
+                  </t>
+                  <t t-foreach="monday" t-as="hours">
+                    <t t-foreach="hours" t-as="hour">
+                      <p>
+                        <t t-esc="hour"/>
+                      </p>
+                    </t>
+                  </t>
+                </div>
+              </div> -->
+
+              <p>Selecciona la fecha y hora que prefieras para el tipo de reunión "<t t-esc="meetingType.name"/>"</p>
+
+
               <div class="row">
                 <div class="col-lg-6">
-                  <p>Selecciona un tipo de reuniónn:</p>
-                  <!-- <select name="meetingTypeSelect" class="form-control">
-                    <t t-foreach="meetingTypes" t-as="meetingType">
-                      <option>
-                        <t t-esc="meetingType.name"/>
-                      </option>
+                  <div class="form-group">
+                    <label for="date" class="control-label">Fecha</label>
+                    <input type="date" name="date" t-attf-min="#{meetingType.start_date}" t-attf-max="#{meetingType.end_date}" required="required" class="form-control o_website_form_date" />
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <label for="timeSelect" class="control-label">Hora</label>
+                  <select name="timeSelect" class="form-control" id="timeSelect" onchange="show_time(this)">
+                    <t t-foreach="monday" t-as="hours">
+                      <t t-foreach="hours" t-as="hour">
+                        <option>
+                          <t t-esc="hour"/>
+                        </option>
+                      </t>
                     </t>
-                  </select> -->
+                  </select>
                 </div>
               </div>
             </form>
