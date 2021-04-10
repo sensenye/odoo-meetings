@@ -25,8 +25,6 @@ class OdooMeetings(http.Controller):
 
     @http.route('/odoo-meetings/<model("odoo_meetings.meeting_type"):obj>/', auth='public', website=True)
     def form_submittt(self, obj, **kw):
-
-        original_stdout = sys.stdout # Save a reference to the original standard output
         
         # Id of the meeting type selected by user
         meetingTypeId = obj.id
@@ -72,7 +70,6 @@ class OdooMeetings(http.Controller):
         print(resource_calendar_attendance_sorted[0].name)
         print('\n\n')
 
-
         availability = self.get_availability(resource_resource, resource_calendar_attendance_sorted, meetingDuration)
 
         return http.request.render('odoo_meetings.select_time', {
@@ -89,9 +86,6 @@ class OdooMeetings(http.Controller):
             'saturday': availability['5'] if '5' in availability else [],
             'sunday': availability['6'] if '6' in availability else []
         })
-
-        # if "key1" in d
-        # a if condition else b
     
     def print_to_file(self, elem):
         original_stdout = sys.stdout # Save a reference to the original standard output
@@ -210,7 +204,6 @@ class OdooMeetings(http.Controller):
 
         sys.stdout = original_stdout # Reset the standard output to its original value
         return availabilityDict
-
 
     def get_hours(self, min_value, max_value, duration):
         original_stdout = sys.stdout
