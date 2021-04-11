@@ -1,3 +1,7 @@
+label {
+  min-width: 7rem;
+}
+
 .text-center {
   text-align: center;
 }
