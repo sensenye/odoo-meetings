@@ -223,19 +223,21 @@ class OdooMeetings(http.Controller):
         minutes = int((decimal*60) % 60)
         return str(hours).zfill(2) + ':' + str(minutes).zfill(2)
 
-    @http.route('/odoo-meetings/meeting-type/submit/', auth='public', website=True)
+    @http.route('/odoo-meetings/submit/', auth='public', website=True)
     def form_submit(self, **kw):
         print('Hola')
-        print(kw.get('meetingTypeSelect'))
+        print(kw.get('meetingTypeId'))
+        # http://localhost:8069/odoo-meetings/submit/?date=2021-04-21&time-select=09%3A30&name=sdfsd&email=info%40grupofomentodirecto.com&comments=
         # employee_ids = [20]
+
         meeting = http.request.env['odoo_meetings.meeting_event'].create({
             'assistant_name': kw.get('name'),
             'assistant_email': kw.get('email'),
             'comments': kw.get('comments'),
             'date': kw.get('date'),
-            'hour': kw.get('hour'),
+            'hour': kw.get('time-select'),
             # 'state': 'TODO: add state',
-            # 'meeting_type': 'TODO: add meeting type',
+            'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
             # 'employee': [(6, 0, employee_ids)]
         })
         return http.request.render('odoo_meetings.form_success', {})

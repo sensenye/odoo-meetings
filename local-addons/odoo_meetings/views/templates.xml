@@ -272,6 +272,7 @@
                 <label for="comments" class="control-label">Comentarios</label>
                 <textarea name="comments" class="form-control" rows="3"/>
               </div>
+              <input type="hidden" name="meetingTypeId" t-att-value="meetingTypeId"/>
               <button type="submit" class="btn btn-primary">Confirmar reunión</button>
         </form>
       </div>

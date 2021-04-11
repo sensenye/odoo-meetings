@@ -12,7 +12,8 @@ class Meeting(models.Model):
     date = fields.Date(string="Fecha", required=True)
     hour = fields.Char(string="Hora", required=True)
     # state = fields.Char(string="Estado", required=True)
-    meeting_type = fields.Many2many('meeting_type', string="Tipo de reunión", relation="odoo_meetings_meeting_type_meeting_event_rel")
+    meeting_type = fields.Many2many('odoo_meetings.meeting_type', string="Tipo de reunión", relation="odoo_meetings_meeting_event_meeting_type_rel")
+    employees = fields.Many2many('hr.employee.public', string="Empleado", relation="odoo_meetings_meeting_event_employee_rel")
     
 
 # class odoo_meetings(models.Model):
