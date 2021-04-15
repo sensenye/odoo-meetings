@@ -278,31 +278,41 @@ class OdooMeetings(http.Controller):
             print('\n', selectedTime)
             print('\n', selectedDay)
 
-            # for i in employee_attendance_order:
-            #     if (selectedTime > )
+            # Get the ID of the first employee available
+            assigned_employee_id = self.get_first_available_employee(employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDay, selectedTime)
+            print('\n', '\n', 'assigned_employee_id', '\n', assigned_employee_id)
 
+        meeting = http.request.env['odoo_meetings.meeting_event'].create({
+            'assistant_name': kw.get('name'),
+            'assistant_email': kw.get('email'),
+            'comments': kw.get('comments'),
+            'date': kw.get('date'),
+            'hour': kw.get('time-select'),
+            # 'state': 'TODO: add state',
+            'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
+            'employee': [(4, assigned_employee_id, 0)]
+        })
 
-            for res in resource_resource:
-                # Employee name + type of working hours name
-                print(res.id, "\t", res.name, "\t", res.calendar_id.name)
-                # Print hours of each type
-                for calendar in resource_calendar_attendance_sorted:
-                    if (calendar.calendar_id.id == res.calendar_id.id):
-                        print(calendar.name, "\t", calendar.hour_from,
-                              " - ", calendar.hour_to)
+        # Save last_employee to the meeting_type table
+        query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
+        # Because models use the same cursor and the Environment holds various caches, these caches must be invalidated when altering the database in raw SQL, or further uses of models may become incoherent
+        http.request.env['odoo_meetings.meeting_type'].invalidate_cache()
+        http.request.env.cr.execute(query)
 
-        # meeting = http.request.env['odoo_meetings.meeting_event'].create({
-        #     'assistant_name': kw.get('name'),
-        #     'assistant_email': kw.get('email'),
-        #     'comments': kw.get('comments'),
-        #     'date': kw.get('date'),
-        #     'hour': kw.get('time-select'),
-        #     # 'state': 'TODO: add state',
-        #     'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
-        #     # 'employee': [(6, 0, employee_ids)]
-        # })
         return http.request.render('odoo_meetings.form_success', {})
 
     def time_to_decimal(self, time):
         (h, m) = time.split(':')
         return int(h) + int(m) / 60
+    def get_first_available_employee(self, employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDay, selectedTime):
+    # Get employee info according to employee_attendance_order
+        for employee_id in employee_attendance_order:
+            for res in resource_resource:
+                if (employee_id == res.id): # Get employee
+                    print('\n', res.id, '\t',res.name)
+                    for calendar in resource_calendar_attendance_sorted:
+                        # Get working type
+                        if (calendar.calendar_id.id == res.calendar_id.id):
+                            if (int(calendar.dayofweek) == int(selectedDay) and calendar.hour_from <= selectedTime <= calendar.hour_to):
+                                print(calendar.dayofweek, "\t",calendar.name, "\t", calendar.hour_from," - ", calendar.hour_to)
+                                return employee_id
