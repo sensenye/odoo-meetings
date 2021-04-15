@@ -34,6 +34,8 @@ class MeetingType(models.Model):
     start_date = fields.Date(string='Fecha de inicio *', default=fields.Date.today())
     end_date = fields.Date(string='Fecha de fin *', default=fields.Date.today())
 
+    last_employee = fields.Integer(default=0, invisible=True)
+
     # localization_options = fields.Selection([
     #     ('normal', 'In Progress'),
     #     ('done', 'Ready for next stage'),
