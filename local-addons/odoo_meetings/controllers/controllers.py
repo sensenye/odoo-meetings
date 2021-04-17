@@ -43,6 +43,7 @@ class OdooMeetings(http.Controller):
             'meetingType': obj,
             # 'employees': meeting_type_employees,
             'meetingTypeId': meetingTypeId,
+            'meetingDuration': meetingDuration,
             'resources': resource_resource,
             # Check key in dictionary
             'monday': availability['0'] if '0' in availability else [],
@@ -243,6 +244,8 @@ class OdooMeetings(http.Controller):
     def form_submit(self, **kw):
 
         meetingTypeId = kw.get('meetingTypeId')
+        meetingDuration = kw.get('meetingDuration')
+
         selectedTime = self.time_to_decimal(kw.get('time-select'))
         # locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
         selectedDay = datetime.datetime.strptime(kw.get('date'), "%Y-%m-%d").weekday()
@@ -282,23 +285,54 @@ class OdooMeetings(http.Controller):
             assigned_employee_id = self.get_first_available_employee(employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDay, selectedTime)
             print('\n', '\n', 'assigned_employee_id', '\n', assigned_employee_id)
 
-        meeting = http.request.env['odoo_meetings.meeting_event'].create({
-            'assistant_name': kw.get('name'),
-            'assistant_email': kw.get('email'),
-            'comments': kw.get('comments'),
-            'date': kw.get('date'),
-            'hour': kw.get('time-select'),
-            # 'state': 'TODO: add state',
-            'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
-            'employee': [(4, assigned_employee_id, 0)]
-        })
+            # Save meeting event to db
+            meeting = http.request.env['odoo_meetings.meeting_event'].create({
+                'assistant_name': kw.get('name'),
+                'assistant_email': kw.get('email'),
+                'comments': kw.get('comments'),
+                'date': kw.get('date'),
+                'hour': kw.get('time-select'),
+                # 'state': 'TODO: add state',
+                'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
+                'employee': [(4, assigned_employee_id, 0)]
+            })
 
-        # Save last_employee to the meeting_type table
-        query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
-        # Because models use the same cursor and the Environment holds various caches, these caches must be invalidated when altering the database in raw SQL, or further uses of models may become incoherent
-        http.request.env['odoo_meetings.meeting_type'].invalidate_cache()
-        http.request.env.cr.execute(query)
+            # Save last_employee to the meeting_type table
+            query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
+            # Because models use the same cursor and the Environment holds various caches, these caches must be invalidated when altering the database in raw SQL, or further uses of models may become incoherent
+            http.request.env['odoo_meetings.meeting_type'].invalidate_cache()
+            http.request.env.cr.execute(query)
 
+            # The user login info is stored on the res_users_id
+            res_users_id = self.get_res_users_id(assigned_employee_id, resource_resource)
+            print('\n\n\n res_users_id: \n', res_users_id)
+
+            # A partner is a employee registered on the website (it has an account and password to access back office).
+            partner_id = self.get_partner_id(assigned_employee_id, resource_resource)
+            print('\n\n\n partner_id: \n', partner_id)
+
+            # Get date time with the format '%Y-%m-%d %H:%M:%S'
+            start_time = kw.get('time-select') + ':00'
+            start_date_time_str = kw.get('date') + ' ' + start_time
+            start_date_time_obj = datetime.datetime.strptime(start_date_time_str, '%Y-%m-%d %H:%M:%S')
+
+            end_time = self.decimal_to_time(selectedTime + float(meetingDuration)/60) + ':00'
+            end_date_time_str = kw.get('date') + ' ' + end_time
+            end_date_time_obj = datetime.datetime.strptime(end_date_time_str, '%Y-%m-%d %H:%M:%S')
+
+            # Save calendar event to DB. Employees will be able to see them on the Odoo Calendar Module
+            calendar_event = http.request.env['calendar.event'].create({
+                'name': 'Reunión con ' + kw.get('name'),
+                'start': start_date_time_obj,
+                'stop': end_date_time_obj,
+                'start_date': kw.get('date'),
+                'stop_date': kw.get('date'),
+                'privacy': 'public',
+                'show_as': 'busy',
+                'user_id': res_users_id, # Responsible
+                'partner_id': [(4, partner_id, 0)], # Responsible Contact
+                'partner_ids': [(4, partner_id, 0)] # Attendees
+            })
         return http.request.render('odoo_meetings.form_success', {})
 
     def time_to_decimal(self, time):
@@ -316,3 +350,12 @@ class OdooMeetings(http.Controller):
                             if (int(calendar.dayofweek) == int(selectedDay) and calendar.hour_from <= selectedTime <= calendar.hour_to):
                                 print(calendar.dayofweek, "\t",calendar.name, "\t", calendar.hour_from," - ", calendar.hour_to)
                                 return employee_id
+
+    def get_partner_id(self, assigned_employee_id, resource_resource):
+        for res in resource_resource:
+            if assigned_employee_id == res.id:
+                return res.user_id.partner_id.id
+    def get_res_users_id(self, assigned_employee_id, resource_resource):
+        for res in resource_resource:
+            if assigned_employee_id == res.id:
+                return res.user_id.id

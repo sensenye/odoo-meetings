@@ -187,8 +187,7 @@
                 </div>
               </div> -->
 
-              <p>Selecciona la fecha y hora que prefieras para el tipo de reunión "<t t-esc="meetingType.name"/>
-"</p>
+              <p>Selecciona la fecha y hora que prefieras para el tipo de reunión "<t t-esc="meetingType.name"/>". La duración es de <t t-esc="meetingType.duration"/> minutos.</p>
               <div class="row">
                 <div class="col-lg-6">
                   <div class="form-group">
@@ -273,6 +272,7 @@
                 <textarea name="comments" class="form-control" rows="3"/>
               </div>
               <input type="hidden" name="meetingTypeId" t-att-value="meetingTypeId"/>
+              <input type="hidden" name="meetingDuration" t-att-value="meetingDuration"/>
               <button type="submit" class="btn btn-primary">Confirmar reunión</button>
         </form>
       </div>
