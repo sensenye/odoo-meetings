@@ -42,6 +42,7 @@ class OdooMeetings(http.Controller):
 
         return http.request.render('odoo_meetings.select_time', {
             'meetingType': obj,
+            'today': datetime.datetime.today().date(),
             # 'employees': meeting_type_employees,
             'meetingTypeId': meetingTypeId,
             'meetingDuration': meetingDuration,

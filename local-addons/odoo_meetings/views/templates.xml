@@ -192,7 +192,7 @@
                 <div class="col-lg-6">
                   <div class="form-group">
                     <label for="date" class="control-label">Fecha</label>
-                    <input type="date" name="date" t-attf-min="#{meetingType.start_date}" t-attf-max="#{meetingType.end_date}" required="required" class="form-control o_website_form_date" onchange="update_time(this)" />
+                    <input type="date" name="date" t-attf-min="#{today}" t-attf-max="#{meetingType.end_date}" required="required" class="form-control o_website_form_date" onchange="update_time(this)" />
                   </div>
                 </div>
                 <div class="col-lg-6">
