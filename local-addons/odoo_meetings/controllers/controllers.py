@@ -4,6 +4,7 @@ import sys
 import json
 import pandas as pd
 import datetime
+from datetime import timedelta
 import locale
 import pytz
 
@@ -321,11 +322,13 @@ class OdooMeetings(http.Controller):
             # Get date time with the format '%Y-%m-%d %H:%M:%S'
             start_time = kw.get('time-select') + ':00'
             start_date_time_str = kw.get('date') + ' ' + start_time
-            start_date_time_obj = datetime.datetime.strptime(start_date_time_str, '%Y-%m-%d %H:%M:%S')
+            start_date_time_obj = self.time_to_utc(start_date_time_str)
 
             end_time = self.decimal_to_time(selectedTime + float(meetingDuration)/60) + ':00'
             end_date_time_str = kw.get('date') + ' ' + end_time
-            end_date_time_obj = datetime.datetime.strptime(end_date_time_str, '%Y-%m-%d %H:%M:%S')
+            end_date_time_obj = self.time_to_utc(end_date_time_str)
+
+            print('timestamp: \n', start_date_time_obj, ' - ', end_date_time_obj)
 
             # Save calendar event to DB. Employees will be able to see them on the Odoo Calendar Module
             calendar_event = http.request.env['calendar.event'].create({
@@ -424,3 +427,10 @@ class OdooMeetings(http.Controller):
         local_time_decimal = self.time_to_decimal(str(local_timestamp_obj.time()))
 
         return local_time_decimal
+
+    def time_to_utc(self, timestamp):
+        # Odoo stores date in UTC format, so it is neccessary to convert it into UTC before saving to database
+        local_timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+        utc_timestamp = local_timestamp - datetime.timedelta(hours=2) # Current timezone is +2:00
+        
+        return utc_timestamp
