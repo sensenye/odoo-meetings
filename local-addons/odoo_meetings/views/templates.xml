@@ -295,5 +295,19 @@
   </t>
 </template>
 
+<template id="form_failure" name="Form Error">
+  <t t-call="website.layout">
+    <div id="wrap">
+      <div class="container">
+        <div class="col-md-12">
+          <div class="alert alert-danger">
+              Oops, no hay nadie disponible. Prueba otra hora
+          </div>
+        </div>
+      </div>
+    </div>
+  </t>
+</template>
+
 </data>
 </odoo>
