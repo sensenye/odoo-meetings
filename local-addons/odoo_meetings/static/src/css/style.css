@@ -43,3 +43,52 @@ label {
 .card-options-container a {
   padding: 1rem 1rem 0rem 1rem;
 }
+
+/* The Modal (background) */
+.odoo-meetings-modal {
+  display: block;
+  position: fixed; /* Stay in place */
+  z-index: 999; /* Sit on top */
+  left: 0;
+  top: 0; 
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  text-align: center;
+}
+
+/* Modal Content */
+.odoo-meetings-modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  padding-left: 4rem;
+	padding-right: 4rem;
+  border: 1px solid #888;
+  width: 40%;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The Close Button */
+.odoo-meetings-close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 1rem;
+  font-weight: bold;
+  align-self: flex-end;
+  /* padding-bottom: 1rem; */
+}
+
+.odoo-meetings-close:hover,
+.odoo-meetings-close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}

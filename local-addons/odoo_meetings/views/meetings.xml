@@ -105,7 +105,7 @@
                                 <a class="o_kanban_manage_toggle_button" data-toggle="dropdown" href="#">
                                     <i class="fa fa-ellipsis-v"/>
                                 </a>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="width: max-content;">
                                     <!-- Edit and Delete actions, if available: -->
                                     <div t-if="widget.editable">
 
@@ -117,6 +117,9 @@
                                         </li>
                                         <li>
                                             <a onclick="copy_url(this)">Copiar URL  <span class="d-none"><field name="id"/><field name="name"/></span></a>
+                                        </li>
+                                        <li>
+                                            <a onclick="download_qr(this)" >Descargar código QR  <span class="d-none"><field name="id"/><field name="name"/></span></a>
                                         </li>
                                     </div>
                                 </ul>
