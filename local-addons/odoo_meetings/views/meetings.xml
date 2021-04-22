@@ -110,10 +110,13 @@
                                     <div t-if="widget.editable">
 
                                         <li>
-                                            <a type="edit">Edit</a>
+                                            <a type="edit">Editar</a>
                                         </li>
                                         <li>
-                                            <a type="delete">Delete</a>
+                                            <a type="delete">Borrar</a>
+                                        </li>
+                                        <li>
+                                            <a onclick="copy_url(this)">Copiar URL  <span class="d-none"><field name="id"/><field name="name"/></span></a>
                                         </li>
                                     </div>
                                 </ul>

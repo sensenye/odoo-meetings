@@ -17,6 +17,7 @@
     <template id="assets_backend" name="account assets" inherit_id="web.assets_backend">
       <xpath expr="." position="inside">
         <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
+        <script src="/odoo_meetings/static/src/js/copy_url.js" type="text/javascript" />
       </xpath>
     </template>
     <!--
