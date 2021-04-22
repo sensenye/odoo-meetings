@@ -273,6 +273,7 @@
               </div>
               <input type="hidden" name="meetingTypeId" t-att-value="meetingTypeId"/>
               <input type="hidden" name="meetingDuration" t-att-value="meetingDuration"/>
+              <input class="btn btn-secondary" type="button" value="Volver" onclick="history.back()" />
               <button type="submit" class="btn btn-primary">Confirmar reunión</button>
         </form>
       </div>
@@ -287,7 +288,7 @@
       <div class="container">
         <div class="col-md-12">
           <div class="alert alert-success">
-                            Customer created successfully.
+            La reunión se ha programado con éxito. Recibirás un correo electrónico con la confirmación de la reunión.
           </div>
         </div>
       </div>
@@ -301,8 +302,9 @@
       <div class="container">
         <div class="col-md-12">
           <div class="alert alert-danger">
-              Oops, no hay nadie disponible. Prueba otra hora
+              Oops, no hay nadie disponible. Prueba otra hora.
           </div>
+          <input class="btn btn-primary mb-5" type="button" value="Volver" onclick="history.back()" />
         </div>
       </div>
     </div>
