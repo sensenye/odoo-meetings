@@ -290,8 +290,8 @@ class OdooMeetings(http.Controller):
             assigned_employee_id = self.get_first_available_employee(employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDate, selectedDay, selectedTime, meetingDuration)
             print('\n', '\n', 'assigned_employee_id', '\n', assigned_employee_id)
 
-            # if -1 == assigned_employee_id: #No employees available
-            return http.request.render('odoo_meetings.form_failure', {})
+            if -1 == assigned_employee_id: #No employees available
+                return http.request.render('odoo_meetings.form_failure', {})
 
             # Save meeting event to db
             meeting = http.request.env['odoo_meetings.meeting_event'].create({
