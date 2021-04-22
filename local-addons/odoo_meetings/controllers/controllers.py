@@ -8,6 +8,14 @@ from datetime import timedelta
 import locale
 import pytz
 
+# Google calendar
+import os.path
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+
+
 # https://odoo-development.readthedocs.io/en/latest/dev/frontend/webpage.html
 # https://kanakinfosystems.com/blog/create-form-in-odoo-website
 
@@ -33,10 +41,12 @@ class OdooMeetings(http.Controller):
         odoo_meetings_meeting_type = self.get_meeting_type(meetingTypeId)
 
         # Get the information of the employees assigned to the meeting type from database
-        resource_resource = self.get_resource_resource(odoo_meetings_meeting_type)
+        resource_resource = self.get_resource_resource(
+            odoo_meetings_meeting_type)
 
         # Get information about the type of working hours of the employees from the resource_calendar_attendance table
-        resource_calendar_attendance_sorted = self.get_resource_calendar_attendance_sorted(resource_resource)
+        resource_calendar_attendance_sorted = self.get_resource_calendar_attendance_sorted(
+            resource_resource)
 
         availability = self.get_availability(
             resource_resource, resource_calendar_attendance_sorted, meetingDuration)
@@ -94,7 +104,7 @@ class OdooMeetings(http.Controller):
         # Sort by id
         resource_calendar_attendance_sorted = resource_calendar_attendance.sorted(
             key='id', reverse=False)
-        
+
         return resource_calendar_attendance_sorted
 
     def print_to_file(self, elem):
@@ -252,8 +262,8 @@ class OdooMeetings(http.Controller):
 
         selectedTime = self.time_to_decimal(kw.get('time-select'))
         # locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
-        selectedDay = datetime.datetime.strptime(selectedDate, "%Y-%m-%d").weekday()
-        
+        selectedDay = datetime.datetime.strptime(
+            selectedDate, "%Y-%m-%d").weekday()
 
         # Get meeting type data from database
         odoo_meetings_meeting_type = self.get_meeting_type(meetingTypeId)
@@ -262,15 +272,17 @@ class OdooMeetings(http.Controller):
         last_employee = odoo_meetings_meeting_type.last_employee
 
         # Get the information of the employees assigned to the meeting type from database
-        resource_resource = self.get_resource_resource(odoo_meetings_meeting_type)
+        resource_resource = self.get_resource_resource(
+            odoo_meetings_meeting_type)
 
         # Get information about the type of working hours of the employees from the resource_calendar_attendance table
-        resource_calendar_attendance_sorted = self.get_resource_calendar_attendance_sorted(resource_resource)
+        resource_calendar_attendance_sorted = self.get_resource_calendar_attendance_sorted(
+            resource_resource)
 
         employee_attendance_order = []
         employee_attendance_recent = []
         # Get a list of employee ID by attendance order. The first ID will be the first employee assigned to the meeting if he is available. If not, the next one and so on. The ID of the first employee that can be assigned must be greater than the ID of the last employee (last_employee) in order to have a more equitative distribution. This way, the ID of the last employee will be at the end of the list, being the last one that can be considered.
-        for res in resource_resource: # Sorted by id
+        for res in resource_resource:  # Sorted by id
             if res.id > last_employee:
                 employee_attendance_order.append(res.id)
             else:
@@ -287,36 +299,40 @@ class OdooMeetings(http.Controller):
             print('\n', selectedDay)
 
             # Get the ID of the first employee available
-            assigned_employee_id = self.get_first_available_employee(employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDate, selectedDay, selectedTime, meetingDuration)
-            print('\n', '\n', 'assigned_employee_id', '\n', assigned_employee_id)
+            assigned_employee_id = self.get_first_available_employee(
+                employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDate, selectedDay, selectedTime, meetingDuration)
+            print('\n', '\n', 'assigned_employee_id',
+                  '\n', assigned_employee_id)
 
-            if -1 == assigned_employee_id: #No employees available
+            if -1 == assigned_employee_id:  # No employees available
                 return http.request.render('odoo_meetings.form_failure', {})
 
-            # Save meeting event to db
-            meeting = http.request.env['odoo_meetings.meeting_event'].create({
-                'assistant_name': kw.get('name'),
-                'assistant_email': kw.get('email'),
-                'comments': kw.get('comments'),
-                'date': kw.get('date'),
-                'hour': kw.get('time-select'),
-                # 'state': 'TODO: add state',
-                'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
-                'employee': [(4, assigned_employee_id, 0)]
-            })
+            # # Save meeting event to db
+            # meeting = http.request.env['odoo_meetings.meeting_event'].create({
+            #     'assistant_name': kw.get('name'),
+            #     'assistant_email': kw.get('email'),
+            #     'comments': kw.get('comments'),
+            #     'date': kw.get('date'),
+            #     'hour': kw.get('time-select'),
+            #     # 'state': 'TODO: add state',
+            #     'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
+            #     'employee': [(4, assigned_employee_id, 0)]
+            # })
 
-            # Save last_employee to the meeting_type table
-            query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
-            # Because models use the same cursor and the Environment holds various caches, these caches must be invalidated when altering the database in raw SQL, or further uses of models may become incoherent
-            http.request.env['odoo_meetings.meeting_type'].invalidate_cache()
-            http.request.env.cr.execute(query)
+            # # Save last_employee to the meeting_type table
+            # query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
+            # # Because models use the same cursor and the Environment holds various caches, these caches must be invalidated when altering the database in raw SQL, or further uses of models may become incoherent
+            # http.request.env['odoo_meetings.meeting_type'].invalidate_cache()
+            # http.request.env.cr.execute(query)
 
             # The user login info is stored on the res_users_id
-            res_users_id = self.get_res_users_id(assigned_employee_id, resource_resource)
+            res_users_id = self.get_res_users_id(
+                assigned_employee_id, resource_resource)
             print('\n\n\n res_users_id: \n', res_users_id)
 
             # A partner is a employee registered on the website (it has an account and password to access back office).
-            partner_id = self.get_partner_id(assigned_employee_id, resource_resource)
+            partner_id = self.get_partner_id(
+                assigned_employee_id, resource_resource)
             print('\n\n\n partner_id: \n', partner_id)
 
             # Get date time with the format '%Y-%m-%d %H:%M:%S'
@@ -324,83 +340,87 @@ class OdooMeetings(http.Controller):
             start_date_time_str = kw.get('date') + ' ' + start_time
             start_date_time_obj = self.time_to_utc(start_date_time_str)
 
-            end_time = self.decimal_to_time(selectedTime + float(meetingDuration)/60) + ':00'
+            end_time = self.decimal_to_time(
+                selectedTime + float(meetingDuration)/60) + ':00'
             end_date_time_str = kw.get('date') + ' ' + end_time
             end_date_time_obj = self.time_to_utc(end_date_time_str)
 
             print('timestamp: \n', start_date_time_obj, ' - ', end_date_time_obj)
 
             # Save calendar event to DB. Employees will be able to see them on the Odoo Calendar Module
-            calendar_event = http.request.env['calendar.event'].create({
-                'name': 'Reunión con ' + kw.get('name'),
-                'start': start_date_time_obj,
-                'stop': end_date_time_obj,
-                'start_date': kw.get('date'),
-                'stop_date': kw.get('date'),
-                'privacy': 'public',
-                'show_as': 'busy',
-                'user_id': res_users_id, # Responsible
-                'partner_id': [(4, partner_id, 0)], # Responsible Contact
-                'partner_ids': [(4, partner_id, 0)] # Attendees
-            })
+            # calendar_event = http.request.env['calendar.event'].create({
+            #     'name': 'Reunión con ' + kw.get('name'),
+            #     'start': start_date_time_obj,
+            #     'stop': end_date_time_obj,
+            #     'start_date': kw.get('date'),
+            #     'stop_date': kw.get('date'),
+            #     'privacy': 'public',
+            #     'show_as': 'busy',
+            #     'user_id': res_users_id, # Responsible
+            #     'partner_id': [(4, partner_id, 0)], # Responsible Contact
+            #     'partner_ids': [(4, partner_id, 0)] # Attendees
+            # })
+
+            self.google_calendar()
 
         return http.request.render('odoo_meetings.form_success', {})
 
     def time_to_decimal(self, time):
-        if len(time) < 6: # Time without seconds
+        if len(time) < 6:  # Time without seconds
             (h, m) = time.split(':')
-        else: # Time with seconds
+        else:  # Time with seconds
             (h, m, s) = time.split(':')
         return int(h) + int(m) / 60
 
     def get_first_available_employee(self, employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDate, selectedDay, selectedTime, meetingDuration):
-    # Get employee info according to employee_attendance_order
+        # Get employee info according to employee_attendance_order
         for employee_id in employee_attendance_order:
             for res in resource_resource:
-                if (employee_id == res.id): # Get employee
-                    print('\n', res.id, '\t',res.name)
+                if (employee_id == res.id):  # Get employee
+                    print('\n', res.id, '\t', res.name)
                     for calendar in resource_calendar_attendance_sorted:
                         # Get working type
                         if (calendar.calendar_id.id == res.calendar_id.id):
                             # Check if employee is working on the day and time selected by user
-                            if (int(calendar.dayofweek) == int(selectedDay) and calendar.hour_from <= selectedTime <= calendar.hour_to): 
+                            if (int(calendar.dayofweek) == int(selectedDay) and calendar.hour_from <= selectedTime <= calendar.hour_to):
                                 # TODO: Check if employee is busy on the day and time selected (check if it has another event on the calendar)
                                 # if (self.isBusy(employee_id, ))
-                                print(calendar.dayofweek, "\t",calendar.name, "\t", calendar.hour_from," - ", calendar.hour_to)
+                                print(calendar.dayofweek, "\t", calendar.name,
+                                      "\t", calendar.hour_from, " - ", calendar.hour_to)
 
-                                res_users_id = self.get_res_users_id(employee_id, resource_resource)
+                                res_users_id = self.get_res_users_id(
+                                    employee_id, resource_resource)
 
                                 # Check if employee is available on the day and time selected (check if it has another event on the calendar)
                                 if self.is_available(res_users_id, selectedDate, selectedTime, meetingDuration):
                                     return employee_id
-        return -1 # No employee available
-
-                                
-
+        return -1  # No employee available
 
     def is_available(self, res_users_id, date_selected, time_selected, meetingDuration):
-         # Get all the calendar events of the employee in the date selected by the user
+        # Get all the calendar events of the employee in the date selected by the user
         today = datetime.datetime.today().date()
         calendar_event = http.request.env['calendar.event'].search([
-            ['start_date', '=', date_selected], 
+            ['start_date', '=', date_selected],
             ['user_id', '=', res_users_id]
         ])
 
         start_time_selected_decimal = time_selected
-        end_time_selected_decimal = start_time_selected_decimal + float(meetingDuration)/60
-        print('\n\n', 'Time selected by user:', start_time_selected_decimal, ' - ', end_time_selected_decimal)
+        end_time_selected_decimal = start_time_selected_decimal + \
+            float(meetingDuration)/60
+        print('\n\n', 'Time selected by user:',
+              start_time_selected_decimal, ' - ', end_time_selected_decimal)
 
         # Check if the employee is available in the date and time selected by user
         for event in calendar_event:
             event_start_time_decimal = self.local_time_decimal(event.start)
             event_end_time_decimal = self.local_time_decimal(event.stop)
             # print(event.start.date(), ' | ', self.local_time_decimal(event.start), ' - ', self.local_time_decimal(event.stop))
-            print(event.start.date(), ' | ', event_start_time_decimal, ' - ', event_end_time_decimal)
+            print(event.start.date(), ' | ', event_start_time_decimal,
+                  ' - ', event_end_time_decimal)
             print(event.partner_id.name, '\n')
             if (start_time_selected_decimal >= event_start_time_decimal or end_time_selected_decimal <= event_end_time_decimal):
                 return False
         return True
-
 
     def get_partner_id(self, assigned_employee_id, resource_resource):
         for res in resource_resource:
@@ -416,21 +436,117 @@ class OdooMeetings(http.Controller):
         # Odoo stores date in UTC format, so it is neccessary to convert it into local format
         user_tz = http.request.env.user.tz or pytz.utc
         local = pytz.timezone(user_tz)
-        
+
         # Timestamp on local format (string)
-        local_timestamp_str = datetime.datetime.strftime(pytz.utc.localize(datetime.datetime.strptime(str(timestamp),'%Y-%m-%d %H:%M:%S')).astimezone(local),'%Y-%m-%d %H:%M:%S')
+        local_timestamp_str = datetime.datetime.strftime(pytz.utc.localize(datetime.datetime.strptime(
+            str(timestamp), '%Y-%m-%d %H:%M:%S')).astimezone(local), '%Y-%m-%d %H:%M:%S')
 
         # Timestamp object
-        local_timestamp_obj = datetime.datetime.strptime(local_timestamp_str, '%Y-%m-%d %H:%M:%S')
+        local_timestamp_obj = datetime.datetime.strptime(
+            local_timestamp_str, '%Y-%m-%d %H:%M:%S')
 
         # Local time
-        local_time_decimal = self.time_to_decimal(str(local_timestamp_obj.time()))
+        local_time_decimal = self.time_to_decimal(
+            str(local_timestamp_obj.time()))
 
         return local_time_decimal
 
     def time_to_utc(self, timestamp):
         # Odoo stores date in UTC format, so it is neccessary to convert it into UTC before saving to database
-        local_timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-        utc_timestamp = local_timestamp - datetime.timedelta(hours=2) # Current timezone is +2:00
-        
+        local_timestamp = datetime.datetime.strptime(
+            timestamp, "%Y-%m-%d %H:%M:%S")
+        utc_timestamp = local_timestamp - \
+            datetime.timedelta(hours=2)  # Current timezone is +2:00
+
         return utc_timestamp
+
+    def google_calendar(self):
+        # If modifying these scopes, delete the file token.json.
+        # https://developers.google.com/calendar/quickstart/python
+        # SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+        SCOPES = ['https://www.googleapis.com/auth/calendar']
+        creds = None
+        # The file token.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists('token.json'):
+            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        # If there are no (valid) credentials available, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'local-addons/odoo_meetings/static/google_calendar/credentials.json', SCOPES)
+                creds = flow.run_local_server(port=51989)
+            # Save the credentials for the next run
+            with open('token.json', 'w') as token:
+                token.write(creds.to_json())
+
+        service = build('calendar', 'v3', credentials=creds)
+
+        # Call the Calendar API
+        # now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+        # print('Getting the upcoming 10 events')
+        # events_result = service.events().list(calendarId='primary', timeMin=now,
+        #                                     maxResults=10, singleEvents=True,
+        #                                     orderBy='startTime').execute()
+        # events = events_result.get('items', [])
+
+        # if not events:
+        #     print('No upcoming events found.')
+        # for event in events:
+        #     start = event['start'].get('dateTime', event['start'].get('date'))
+        #     print(start, event['summary'])
+
+        # https://developers.google.com/calendar/create-events#python
+        # https://developers.google.com/calendar/v3/reference/events#conferenceData
+
+        event = {
+            'summary': 'Google I/O 2015',
+            'location': '800 Howard St., San Francisco, CA 94103',
+            'description': 'A chance to hear more about Google\'s developer products.',
+            'start': {
+                'dateTime': '2021-04-29T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2021-04-29T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            # 'recurrence': [
+            #     'RRULE:FREQ=DAILY;COUNT=2'
+            # ],
+            'attendees': [
+                {'email': 'sensen.yechen@gmail.com'},
+                {'email': '100349203@alumnos.uc3m.es'},
+            ],
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
+                ],
+            },
+            'conferenceData': {
+                'createRequest': {
+                    'conferenceSolutionKey': {
+                        'type': 'hangoutsMeet'
+                    },
+                    'requestId': 'requestId'
+                },
+                'entryPoints': [
+                    {
+                        'entryPointType': 'video'
+                    }
+                ]
+            }
+        }
+
+        event = service.events().insert(
+            calendarId='primary',
+            conferenceDataVersion=1, # Allow google meet/hangouts
+            sendNotifications=True,
+            sendUpdates='all',
+            body=event).execute()
+        print('Event created: ', event.get('htmlLink'))
