@@ -361,7 +361,16 @@ class OdooMeetings(http.Controller):
             #     'partner_ids': [(4, partner_id, 0)] # Attendees
             # })
 
-            self.google_calendar()
+
+            client_event_name = 'Reunión con ' + self.get_employee_name(assigned_employee_id, resource_resource)
+
+            start_date_time_with_tz = start_date_time_obj.replace(tzinfo=pytz.utc)
+            end_date_time_with_tz = end_date_time_obj.replace(tzinfo=pytz.utc)
+            # Google calendar date time uses RFC 3339 format
+            start_date_time_with_tz_iso = start_date_time_with_tz.isoformat()
+            end_date_time_with_tz_iso = end_date_time_with_tz.isoformat()
+
+            self.google_calendar(client_event_name,start_date_time_with_tz_iso, end_date_time_with_tz_iso)
 
         return http.request.render('odoo_meetings.form_success', {})
 
@@ -431,6 +440,11 @@ class OdooMeetings(http.Controller):
         for res in resource_resource:
             if assigned_employee_id == res.id:
                 return res.user_id.id
+    
+    def get_employee_name(self, employee_id, resource_resource):
+        for res in resource_resource:
+            if (employee_id == res.id):  # Get employee
+                return res.name
 
     def local_time_decimal(self, timestamp):
         # Odoo stores date in UTC format, so it is neccessary to convert it into local format
@@ -460,7 +474,7 @@ class OdooMeetings(http.Controller):
 
         return utc_timestamp
 
-    def google_calendar(self):
+    def google_calendar(self, event_name, start_date_time, end_date_time):
         # If modifying these scopes, delete the file token.json.
         # https://developers.google.com/calendar/quickstart/python
         # SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -503,23 +517,27 @@ class OdooMeetings(http.Controller):
         # https://developers.google.com/calendar/v3/reference/events#conferenceData
 
         event = {
-            'summary': 'Google I/O 2015',
+            'summary': event_name,
             'location': '800 Howard St., San Francisco, CA 94103',
             'description': 'A chance to hear more about Google\'s developer products.',
             'start': {
-                'dateTime': '2021-04-29T09:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
+                # 'dateTime': '2021-04-29T09:00:00-07:00',
+                # 'timeZone': 'America/Los_Angeles',
+                'dateTime': start_date_time,
+                'timeZone': pytz.utc.zone,
             },
             'end': {
-                'dateTime': '2021-04-29T17:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
+                # 'dateTime': '2021-04-29T17:00:00-07:00',
+                # 'timeZone': 'America/Los_Angeles',
+                'dateTime': end_date_time,
+                'timeZone': pytz.utc.zone,
             },
             # 'recurrence': [
             #     'RRULE:FREQ=DAILY;COUNT=2'
             # ],
             'attendees': [
                 {'email': 'sensen.yechen@gmail.com'},
-                {'email': '100349203@alumnos.uc3m.es'},
+                # {'email': '100349203@alumnos.uc3m.es'},
             ],
             'reminders': {
                 'useDefault': False,
