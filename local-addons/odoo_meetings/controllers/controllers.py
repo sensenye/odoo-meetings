@@ -57,6 +57,7 @@ class OdooMeetings(http.Controller):
             # 'employees': meeting_type_employees,
             'meetingTypeId': meetingTypeId,
             'meetingDuration': meetingDuration,
+            'meetingDescription': obj.description,
             'resources': resource_resource,
             # Check key in dictionary
             'monday': availability['0'] if '0' in availability else [],
@@ -257,8 +258,10 @@ class OdooMeetings(http.Controller):
     def form_submit(self, **kw):
 
         meetingTypeId = kw.get('meetingTypeId')
+        meetingDescription = kw.get('meetingDescription')
         meetingDuration = kw.get('meetingDuration')
         selectedDate = kw.get('date')
+        attendeeEmail = kw.get('email')
 
         selectedTime = self.time_to_decimal(kw.get('time-select'))
         # locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
@@ -370,7 +373,9 @@ class OdooMeetings(http.Controller):
             start_date_time_with_tz_iso = start_date_time_with_tz.isoformat()
             end_date_time_with_tz_iso = end_date_time_with_tz.isoformat()
 
-            self.google_calendar(client_event_name,start_date_time_with_tz_iso, end_date_time_with_tz_iso)
+            # print(attendeeEmail)
+
+            self.google_calendar(client_event_name, meetingDescription, start_date_time_with_tz_iso, end_date_time_with_tz_iso, attendeeEmail)
 
         return http.request.render('odoo_meetings.form_success', {})
 
@@ -474,7 +479,7 @@ class OdooMeetings(http.Controller):
 
         return utc_timestamp
 
-    def google_calendar(self, event_name, start_date_time, end_date_time):
+    def google_calendar(self, event_name, meetingDescription, start_date_time, end_date_time, attendeeEmail):
         # If modifying these scopes, delete the file token.json.
         # https://developers.google.com/calendar/quickstart/python
         # SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -519,7 +524,8 @@ class OdooMeetings(http.Controller):
         event = {
             'summary': event_name,
             'location': '800 Howard St., San Francisco, CA 94103',
-            'description': 'A chance to hear more about Google\'s developer products.',
+            # 'description': 'A chance to hear more about Google\'s developer products.',
+            'description': meetingDescription,
             'start': {
                 # 'dateTime': '2021-04-29T09:00:00-07:00',
                 # 'timeZone': 'America/Los_Angeles',
@@ -538,6 +544,7 @@ class OdooMeetings(http.Controller):
             'attendees': [
                 {'email': 'sensen.yechen@gmail.com'},
                 # {'email': '100349203@alumnos.uc3m.es'},
+                {'email': attendeeEmail}
             ],
             'reminders': {
                 'useDefault': False,

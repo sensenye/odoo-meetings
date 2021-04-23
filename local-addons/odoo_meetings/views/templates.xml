@@ -274,6 +274,7 @@
               </div>
               <input type="hidden" name="meetingTypeId" t-att-value="meetingTypeId"/>
               <input type="hidden" name="meetingDuration" t-att-value="meetingDuration"/>
+              <input type="hidden" name="meetingDescription" t-att-value="meetingDescription"/>
               <input class="btn btn-secondary" type="button" value="Volver" onclick="history.back()" />
               <button type="submit" class="btn btn-primary">Confirmar reunión</button>
         </form>
