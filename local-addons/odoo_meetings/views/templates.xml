@@ -292,9 +292,23 @@
   <t t-call="website.layout">
     <div id="wrap">
       <div class="container">
-        <div class="col-md-12">
+        <div class="col-md-12 py-5">
           <div class="alert alert-success">
             La reunión se ha programado con éxito. Recibirás un correo electrónico con la confirmación de la reunión.
+          </div>
+        </div>
+      </div>
+    </div>
+  </t>
+</template>
+
+<template id="delete_event_success" name="Form Successfully Submitted">
+  <t t-call="website.layout">
+    <div id="wrap">
+      <div class="container py-5">
+        <div class="col-md-12">
+          <div class="alert alert-success">
+            La reunión programada se ha cancelado con éxito. Recibirás un correo electrónico con la cancelación de la reunión.
           </div>
         </div>
       </div>
@@ -306,11 +320,28 @@
   <t t-call="website.layout">
     <div id="wrap">
       <div class="container">
-        <div class="col-md-12">
+        <div class="col-md-12 py-5">
           <div class="alert alert-danger">
               Oops, no hay nadie disponible. Prueba otra hora.
           </div>
           <input class="btn btn-primary mb-5" type="button" value="Volver" onclick="history.back()" />
+        </div>
+      </div>
+    </div>
+  </t>
+</template>
+
+<template id="update_delete_event" name="Update event">
+  <t t-call="website.layout">
+    <div id="wrap">
+      <div class="container py-4">
+        <div class="col-md-12">
+          <h2><t t-esc="meeting_type_name"/></h2>
+          <h5><t t-esc="address"/></h5>
+          <p>¡Hola <t t-esc="assistant_name"/>! Tenías una reunión con <t t-esc="employee_name"/> el <t t-esc="date"/> a las <t t-esc="hour"/>. Si quieres cancelar la reunión programada, haz clic en el siguiente botón.</p>
+          
+          <a t-attf-href="/odoo-meetings/event/#{event_id}/delete" class="btn btn-primary mb-5">              Cancelar reunión
+          </a>
         </div>
       </div>
     </div>

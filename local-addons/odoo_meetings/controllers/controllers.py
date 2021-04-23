@@ -313,18 +313,7 @@ class OdooMeetings(http.Controller):
 
             if -1 == assigned_employee_id:  # No employees available
                 return http.request.render('odoo_meetings.form_failure', {})
-
-            # # Save meeting event to db
-            # meeting = http.request.env['odoo_meetings.meeting_event'].create({
-            #     'assistant_name': kw.get('name'),
-            #     'assistant_email': kw.get('email'),
-            #     'comments': kw.get('comments'),
-            #     'date': kw.get('date'),
-            #     'hour': kw.get('time-select'),
-            #     # 'state': 'TODO: add state',
-            #     'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
-            #     'employee': [(4, assigned_employee_id, 0)]
-            # })
+            
 
             # # Save last_employee to the meeting_type table
             # query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
@@ -368,7 +357,7 @@ class OdooMeetings(http.Controller):
             #     'partner_ids': [(4, partner_id, 0)] # Attendees
             # })
 
-            # Create a Google Calendar event
+             # Create a Google Calendar event
             client_event_name = 'Reunión con ' + self.get_employee_name(assigned_employee_id, resource_resource)
 
             start_date_time_with_tz = start_date_time_obj.replace(tzinfo=pytz.utc)
@@ -377,7 +366,20 @@ class OdooMeetings(http.Controller):
             start_date_time_with_tz_iso = start_date_time_with_tz.isoformat()
             end_date_time_with_tz_iso = end_date_time_with_tz.isoformat()
 
-            self.google_calendar(client_event_name, meetingDescription, start_date_time_with_tz_iso, end_date_time_with_tz_iso, attendeeEmail, meetingLocation, meetingAddress)
+            google_calendar_event_id = self.create_google_calendar_event(client_event_name, meetingDescription, start_date_time_with_tz_iso, end_date_time_with_tz_iso, attendeeEmail, meetingLocation, meetingAddress)
+
+            # Save meeting event to db
+            meeting = http.request.env['odoo_meetings.meeting_event'].create({
+                'assistant_name': kw.get('name'),
+                'assistant_email': kw.get('email'),
+                'comments': kw.get('comments'),
+                'date': kw.get('date'),
+                'hour': kw.get('time-select'),
+                # 'state': 'TODO: add state',
+                'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
+                'employee': [(4, assigned_employee_id, 0)],
+                'google_calendar_event_id': google_calendar_event_id
+            })
 
         return http.request.render('odoo_meetings.form_success', {})
 
@@ -481,7 +483,7 @@ class OdooMeetings(http.Controller):
 
         return utc_timestamp
 
-    def google_calendar(self, event_name, meetingDescription, start_date_time, end_date_time, attendeeEmail, meetingLocation, meetingAddress):
+    def get_google_calendar_service(self):
         # If modifying these scopes, delete the file token.json.
         # https://developers.google.com/calendar/quickstart/python
         # SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -506,22 +508,11 @@ class OdooMeetings(http.Controller):
 
         service = build('calendar', 'v3', credentials=creds)
 
-        # Call the Calendar API
-        # now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-        # print('Getting the upcoming 10 events')
-        # events_result = service.events().list(calendarId='primary', timeMin=now,
-        #                                     maxResults=10, singleEvents=True,
-        #                                     orderBy='startTime').execute()
-        # events = events_result.get('items', [])
+        return service
 
-        # if not events:
-        #     print('No upcoming events found.')
-        # for event in events:
-        #     start = event['start'].get('dateTime', event['start'].get('date'))
-        #     print(start, event['summary'])
+    def create_google_calendar_event(self, event_name, meetingDescription, start_date_time, end_date_time, attendeeEmail, meetingLocation, meetingAddress):
 
-        # https://developers.google.com/calendar/create-events#python
-        # https://developers.google.com/calendar/v3/reference/events#conferenceData
+        service = self.get_google_calendar_service()
 
         if (meetingLocation == 'google_meet'):
             conferenceData = { # Add Google meet to Google Calendar event
@@ -572,4 +563,32 @@ class OdooMeetings(http.Controller):
             sendNotifications=True,
             sendUpdates='all',
             body=event).execute()
+        return event.get('id')
         # print('Event created: ', event.get('htmlLink'))
+
+    @http.route('/odoo-meetings/event/<model("odoo_meetings.meeting_event"):obj>/', auth='public', website=True)
+    def update_meeting_event(self, obj, **kw):
+        # meetingTypes = http.request.env['odoo_meetings.meeting_type']
+        return http.request.render('odoo_meetings.update_delete_event', {
+            'event_id': obj.id,
+            'assistant_name': obj.assistant_name,
+            'employee_name': obj.employee.name,
+            'meeting_type_name': obj.meeting_type.name,
+            'date': obj.date,
+            'hour': obj.hour,
+            'address': obj.meeting_type.address
+        })
+
+    @http.route('/odoo-meetings/event/<model("odoo_meetings.meeting_event"):obj>/delete/', auth='public', website=True)
+    def delete_meeting_event(self, obj, **kw):
+        # Remove google calendar event
+        service = self.get_google_calendar_service()
+        service.events().delete(calendarId='primary', eventId=obj.google_calendar_event_id, sendUpdates="all").execute()
+        
+        # Remove meeting event from database
+        meeting_event = http.request.env['odoo_meetings.meeting_event'].search([
+            ['id', '=', obj.id]
+        ])
+        meeting_event.unlink();
+        
+        return http.request.render('odoo_meetings.delete_event_success')
