@@ -81,12 +81,14 @@
                     <t t-foreach="meetingTypes" t-as="meetingType">
                       <p t-if="meetingType_first" class="d-block">
                         <t t-esc="meetingType.description"/>
+                        <t t-esc="meetingType.address"/>
                         <a t-attf-href="/odoo-meetings/#{meetingType.id}" class="btn btn-primary">
                           Siguiente
                         </a>
                       </p>
                       <p t-else="meetingType_first" class="d-none">
                         <t t-esc="meetingType.description"/>
+                        <t t-esc="meetingType.address"/>
                         <a t-attf-href="/odoo-meetings/#{meetingType.id}" class="btn btn-primary">
                           Siguiente
                         </a>
@@ -275,6 +277,8 @@
               <input type="hidden" name="meetingTypeId" t-att-value="meetingTypeId"/>
               <input type="hidden" name="meetingDuration" t-att-value="meetingDuration"/>
               <input type="hidden" name="meetingDescription" t-att-value="meetingDescription"/>
+              <input type="hidden" name="meetingLocation" t-att-value="meetingLocation"/>
+              <input type="hidden" name="meetingAddress" t-att-value="meetingAddress"/>
               <input class="btn btn-secondary" type="button" value="Volver" onclick="history.back()" />
               <button type="submit" class="btn btn-primary">Confirmar reunión</button>
         </form>

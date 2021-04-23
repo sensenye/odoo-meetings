@@ -58,6 +58,8 @@ class OdooMeetings(http.Controller):
             'meetingTypeId': meetingTypeId,
             'meetingDuration': meetingDuration,
             'meetingDescription': obj.description,
+            'meetingLocation': obj.location,
+            'meetingAddress': obj.address,
             'resources': resource_resource,
             # Check key in dictionary
             'monday': availability['0'] if '0' in availability else [],
@@ -260,6 +262,8 @@ class OdooMeetings(http.Controller):
         meetingTypeId = kw.get('meetingTypeId')
         meetingDescription = kw.get('meetingDescription')
         meetingDuration = kw.get('meetingDuration')
+        meetingLocation = kw.get('meetingLocation')
+        meetingAddress = kw.get('meetingAddress')
         selectedDate = kw.get('date')
         attendeeEmail = kw.get('email')
 
@@ -364,7 +368,7 @@ class OdooMeetings(http.Controller):
             #     'partner_ids': [(4, partner_id, 0)] # Attendees
             # })
 
-
+            # Create a Google Calendar event
             client_event_name = 'Reunión con ' + self.get_employee_name(assigned_employee_id, resource_resource)
 
             start_date_time_with_tz = start_date_time_obj.replace(tzinfo=pytz.utc)
@@ -373,9 +377,7 @@ class OdooMeetings(http.Controller):
             start_date_time_with_tz_iso = start_date_time_with_tz.isoformat()
             end_date_time_with_tz_iso = end_date_time_with_tz.isoformat()
 
-            # print(attendeeEmail)
-
-            self.google_calendar(client_event_name, meetingDescription, start_date_time_with_tz_iso, end_date_time_with_tz_iso, attendeeEmail)
+            self.google_calendar(client_event_name, meetingDescription, start_date_time_with_tz_iso, end_date_time_with_tz_iso, attendeeEmail, meetingLocation, meetingAddress)
 
         return http.request.render('odoo_meetings.form_success', {})
 
@@ -479,7 +481,7 @@ class OdooMeetings(http.Controller):
 
         return utc_timestamp
 
-    def google_calendar(self, event_name, meetingDescription, start_date_time, end_date_time, attendeeEmail):
+    def google_calendar(self, event_name, meetingDescription, start_date_time, end_date_time, attendeeEmail, meetingLocation, meetingAddress):
         # If modifying these scopes, delete the file token.json.
         # https://developers.google.com/calendar/quickstart/python
         # SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -521,22 +523,30 @@ class OdooMeetings(http.Controller):
         # https://developers.google.com/calendar/create-events#python
         # https://developers.google.com/calendar/v3/reference/events#conferenceData
 
-        event = {
+        if (meetingLocation == 'google_meet'):
+            conferenceData = { # Add Google meet to Google Calendar event
+                'createRequest': {
+                    'conferenceSolutionKey': {
+                        'type': 'hangoutsMeet'
+                    },
+                    'requestId': 'requestId'
+                },
+                'entryPoints': [{'entryPointType': 'video'}]
+            }
+        else: 
+            conferenceData = {}
+
+        event = { # Google Calendar event JSON
             'summary': event_name,
-            'location': '800 Howard St., San Francisco, CA 94103',
-            # 'description': 'A chance to hear more about Google\'s developer products.',
+            'location': meetingAddress,
             'description': meetingDescription,
             'start': {
-                # 'dateTime': '2021-04-29T09:00:00-07:00',
-                # 'timeZone': 'America/Los_Angeles',
                 'dateTime': start_date_time,
-                'timeZone': pytz.utc.zone,
+                'timeZone': pytz.utc.zone, # UTC timezone
             },
             'end': {
-                # 'dateTime': '2021-04-29T17:00:00-07:00',
-                # 'timeZone': 'America/Los_Angeles',
                 'dateTime': end_date_time,
-                'timeZone': pytz.utc.zone,
+                'timeZone': pytz.utc.zone, # UTC timezone
             },
             # 'recurrence': [
             #     'RRULE:FREQ=DAILY;COUNT=2'
@@ -544,7 +554,7 @@ class OdooMeetings(http.Controller):
             'attendees': [
                 {'email': 'sensen.yechen@gmail.com'},
                 # {'email': '100349203@alumnos.uc3m.es'},
-                {'email': attendeeEmail}
+                # {'email': attendeeEmail}
             ],
             'reminders': {
                 'useDefault': False,
@@ -553,19 +563,7 @@ class OdooMeetings(http.Controller):
                     {'method': 'popup', 'minutes': 10},
                 ],
             },
-            'conferenceData': {
-                'createRequest': {
-                    'conferenceSolutionKey': {
-                        'type': 'hangoutsMeet'
-                    },
-                    'requestId': 'requestId'
-                },
-                'entryPoints': [
-                    {
-                        'entryPointType': 'video'
-                    }
-                ]
-            }
+            'conferenceData': conferenceData
         }
 
         event = service.events().insert(
@@ -574,4 +572,4 @@ class OdooMeetings(http.Controller):
             sendNotifications=True,
             sendUpdates='all',
             body=event).execute()
-        print('Event created: ', event.get('htmlLink'))
+        # print('Event created: ', event.get('htmlLink'))

@@ -14,11 +14,11 @@ class MeetingType(models.Model):
     # ]
 
     name = fields.Char(string="Tipo de reunión *", required=True)
-    localization = fields.Selection([
+    location = fields.Selection([
         ('physical', 'Físico'),
         ('google_meet', 'Google Meet'),
     ], default='google_meet', required=True, string="Localización *")
-    # localization = fields.Char(string="Localización", required=True)
+    address = fields.Char(string="Dirección", help="Es la ubicación que se le mostrará al usuario. Puedes poner Google Meet, videoconferencia, una dirección física...", required=True)
     description = fields.Char(string="Descripción *", required=True)
     employees = fields.Many2many('hr.employee.public', string="Empleado", relation="odoo_meetings_meeting_type_employee_rel")
     # date_range = fields.Char(string="Rango", required=True)
@@ -27,7 +27,7 @@ class MeetingType(models.Model):
     #     ('range', 'Dentro de un rango de fechas'),
     #     ('infinite', 'De manera indefinida'),
     # ], default='google_meet', required=True)
-    duration = fields.Integer(string="Duración *", required=True)
+    duration = fields.Integer(string="Duración *", required=True, default=30)
     daily_limit = fields.Integer(string="Límite diario *", required=True)
     url = fields.Char()
 

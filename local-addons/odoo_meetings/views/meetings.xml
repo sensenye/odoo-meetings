@@ -25,8 +25,8 @@
                         <page string="Información general">
                             <group>
                                 <field name="name"/>
-                                <field name="localization"/>
-                                <!-- <field name="description" widget="html"/> -->
+                                <field name="location"/>
+                                <field name="address"/>
                                 <field name="description"/>
                             </group>
                         </page>
@@ -84,7 +84,7 @@
         <field name="arch" type="xml">
             <kanban class="o_res_partner_kanban">
                 <field name="name"/>
-                <field name="localization"/>
+                <field name="location"/>
                 <!-- <field name="description"/>
                 <field name="email"/>
                 <field name="mobile"/> -->
@@ -128,7 +128,7 @@
 
                                 <field name="name"/>
                                 <p>
-                                    <field name="localization"/>
+                                    <field name="location"/> - <field name="address"/>
                                 </p>
                                 <!-- <div t-if="record.mobile.value">
                                     <t t-esc="record.mobile.value"/>
