@@ -370,7 +370,7 @@ class OdooMeetings(http.Controller):
 
             base_url = http.request.env['ir.config_parameter'].get_param('web.base.url')
             delete_event_url = base_url + '/odoo-meetings/event/' + str(meeting.id)
-            google_calendar_event_description = meetingDescription + '\n\nSi quieres cancelar la reunión, haz clic en el siguiente enlace: ' + delete_event_url
+            google_calendar_event_description = meetingDescription + '\n\nSi quieres cancelar/modificar la reunión, haz clic en el siguiente enlace: ' + delete_event_url
             # print(google_calendar_event_description)
             
             # Create Google Calendar event
@@ -388,7 +388,7 @@ class OdooMeetings(http.Controller):
                 google_meet_url = google_calendar_event.get('conferenceData').get('entryPoints')[0].get('label')
                 google_meet_msg = 'Para conectarte a la reunión de Google Meet, haz clic en el siguiente enlace: ' + google_meet_url + '\n'
 
-            odoo_calendar_event_description = meetingDescription + '\n' + google_meet_msg + 'Si quieres cancelar la reunión, haz clic en el siguiente enlace: ' + delete_event_url
+            odoo_calendar_event_description = meetingDescription + '\n' + google_meet_msg + 'Si quieres cancelar/modificar la reunión, haz clic en el siguiente enlace: ' + delete_event_url
 
             # print(odoo_calendar_event_description)
 
@@ -604,30 +604,35 @@ class OdooMeetings(http.Controller):
         # print('Event created: ', event.get('htmlLink'))
 
     @http.route('/odoo-meetings/event/<model("odoo_meetings.meeting_event"):obj>/', auth='public', website=True)
-    def update_meeting_event(self, obj, **kw):
-        # meetingTypes = http.request.env['odoo_meetings.meeting_type']
-        return http.request.render('odoo_meetings.update_delete_event', {
-            'event_id': obj.id,
-            'assistant_name': obj.assistant_name,
-            'employee_name': obj.employee.name,
-            'meeting_type_name': obj.meeting_type.name,
-            'date': obj.date,
-            'hour': obj.hour,
-            'address': obj.meeting_type.address
-        })
+    def update_meeting_event_index(self, obj, **kw):
+        action = kw.get('action')
+        if action == 'update': # Delete/Update calendar event
+            return self.delete_meeting_event(obj)
+        else:  # Show update meeting screen    
+            return self.show_update_meeting_event_screen(obj)
 
-    @http.route('/odoo-meetings/event/<model("odoo_meetings.meeting_event"):obj>/delete/', auth='public', website=True)
-    def delete_meeting_event(self, obj, **kw):
+    def show_update_meeting_event_screen(self, meetingEvent):
+        return http.request.render('odoo_meetings.update_delete_event', {
+            'event_id': meetingEvent.id,
+            'assistant_name': meetingEvent.assistant_name,
+            'employee_name': meetingEvent.employee.name,
+            'meeting_type_name': meetingEvent.meeting_type.name,
+            'date': meetingEvent.date,
+            'hour': meetingEvent.hour,
+            'address': meetingEvent.meeting_type.address
+        })
+    
+
+    def delete_meeting_event(self, meetingEvent):
         # Remove google calendar event
         service = self.get_google_calendar_service()
-        service.events().delete(calendarId='primary', eventId=obj.google_calendar_event_id, sendUpdates="all").execute()
+        service.events().delete(calendarId='primary', eventId=meetingEvent.google_calendar_event_id, sendUpdates="all").execute()
         
         meeting_event = http.request.env['odoo_meetings.meeting_event'].search([
-            ['id', '=', obj.id]
+            ['id', '=', meetingEvent.id]
         ])
         # Remove event from meeting_event & calendar_event tables
         meeting_event.calendar_event.unlink()
         meeting_event.unlink()
-        
         
         return http.request.render('odoo_meetings.delete_event_success')
