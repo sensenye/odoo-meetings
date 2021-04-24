@@ -410,6 +410,8 @@ class OdooMeetings(http.Controller):
 
             # Update google_calendar_event_id on the meeting
             meeting.write({ 'calendar_event': [(4, calendar_event.id, 0)] })
+            # Increase in 1 the number of meetings of the meeting type
+            odoo_meetings_meeting_type.write({ 'num_meetings': odoo_meetings_meeting_type.num_meetings + 1 })     
 
         return http.request.render('odoo_meetings.form_success', {})
 
@@ -628,11 +630,19 @@ class OdooMeetings(http.Controller):
         service = self.get_google_calendar_service()
         service.events().delete(calendarId='primary', eventId=meetingEvent.google_calendar_event_id, sendUpdates="all").execute()
         
+        # Decrease in 1 the number of meetings of the meeting type
+        odoo_meetings_meeting_type = http.request.env['odoo_meetings.meeting_type'].search([
+            ['id', '=', meetingEvent.meeting_type.id]
+        ])
+        odoo_meetings_meeting_type.write({ 'num_meetings': odoo_meetings_meeting_type.num_meetings - 1 })
+        
         meeting_event = http.request.env['odoo_meetings.meeting_event'].search([
             ['id', '=', meetingEvent.id]
         ])
         # Remove event from meeting_event & calendar_event tables
         meeting_event.calendar_event.unlink()
         meeting_event.unlink()
+
+        
         
         return http.request.render('odoo_meetings.delete_event_success')

@@ -3,11 +3,12 @@
     <record id="view_calendar_event_search_external" model="ir.ui.view">
         <field name="name">calendar.event.search.expand</field>
         <field name="model">calendar.event</field>
+         <!-- <field name="model">odoo_meetings.meeting_type</field> -->
         <field name="inherit_id" ref="calendar.view_calendar_event_search"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='mymeetings']" position="after">
                 <separator/>
-                <filter string="Odoo Meetings" help="Odoo Meetings" name="myodoomeetings" />
+                <!-- <filter string="Odoo Meetings" help="Odoo Meetings" name="myodoomeetings" domain="[('odoo_meetings.meeting_event.name', '=', 'Tipo Reunion 1')]"/> -->
                 <separator/>
             </xpath>
         </field>
@@ -128,8 +129,12 @@
 
                                 <field name="name"/>
                                 <p>
-                                    <field name="location"/> - <field name="address"/>
+                                    <field name="start_date"/> - <field name="end_date"/> (<field name="duration"/> min.)
                                 </p>
+                                <p>
+                                    <field name="location"/> | <field name="address"/>
+                                </p>
+                                
                                 <!-- <div t-if="record.mobile.value">
                                     <t t-esc="record.mobile.value"/>
                                 </div>
@@ -138,7 +143,7 @@
                                 </div> -->
                                 <div class="text-center pt-4">
                                     <button class="btn btn-primary" name="open_calendar" type="object">
-                                    XXX Reuniones
+                                    Nº reuniones: <field name="num_meetings"/> 
                                     </button>
                                 </div>
                             </div>

@@ -36,6 +36,11 @@ class MeetingType(models.Model):
 
     last_employee = fields.Integer(default=0, invisible=True)
 
+
+    # meeting_event = fields.Many2many('odoo_meetings.meeting_event', relation="odoo_meetings_meeting_event_meeting_type_rel")
+
+    num_meetings = fields.Integer()
+
     # localization_options = fields.Selection([
     #     ('normal', 'In Progress'),
     #     ('done', 'Ready for next stage'),
@@ -45,7 +50,7 @@ class MeetingType(models.Model):
         return self.description
 
     def open_calendar(self):
-        print("Hola")
+        # print("Hola")
         return {
             "type": "ir.actions.act_window",
             "res_model": "calendar.event",
@@ -89,6 +94,18 @@ class MeetingType(models.Model):
             return {
             'warning': {'title': "Warning", 'message': "La fecha de inicio tiene que ser menor que la fecha de fin", 'type': 'notification'},
             }
+    
+    # @api.depends('meeting_event', 'name')
+    # def _get_num_meetings(self):
+    #     num = 0
+
+    #     for meeting_type in self:
+
+
+    #     for event in self.meeting_event:
+    #         if event.meeting_type.name == self.name:
+    #             num += 1
+    #     return num
 
     # @api.onchange('start_date', 'end_date')
     # def cheking_field_date(self):
