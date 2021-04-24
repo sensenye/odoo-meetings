@@ -408,6 +408,9 @@ class OdooMeetings(http.Controller):
                 'description': odoo_calendar_event_description
             })
 
+            # Update google_calendar_event_id on the meeting
+            meeting.write({ 'calendar_event': [(4, calendar_event.id, 0)] })
+
         return http.request.render('odoo_meetings.form_success', {})
 
     def time_to_decimal(self, time):
@@ -577,8 +580,8 @@ class OdooMeetings(http.Controller):
             'attendees': [
                 {'email': 'sensen.yechen@gmail.com'},
                 # {'email': '100349203@alumnos.uc3m.es'},
-                # {'email': attendeeEmail},
-                # {'email': employeeEmail}
+                {'email': attendeeEmail},
+                {'email': employeeEmail}
             ],
             'reminders': {
                 'useDefault': False,
@@ -619,10 +622,12 @@ class OdooMeetings(http.Controller):
         service = self.get_google_calendar_service()
         service.events().delete(calendarId='primary', eventId=obj.google_calendar_event_id, sendUpdates="all").execute()
         
-        # Remove meeting event from database
         meeting_event = http.request.env['odoo_meetings.meeting_event'].search([
             ['id', '=', obj.id]
         ])
-        meeting_event.unlink();
+        # Remove event from meeting_event & calendar_event tables
+        meeting_event.calendar_event.unlink()
+        meeting_event.unlink()
+        
         
         return http.request.render('odoo_meetings.delete_event_success')

@@ -14,6 +14,7 @@ class Meeting(models.Model):
     # state = fields.Char(string="Estado", required=True)
     meeting_type = fields.Many2many('odoo_meetings.meeting_type', string="Tipo de reunión", relation="odoo_meetings_meeting_event_meeting_type_rel")
     employee = fields.Many2many('hr.employee.public', string="Empleado", relation="odoo_meetings_meeting_event_employee_rel")
+    calendar_event = fields.Many2many('calendar.event', string="Evento de calendario", relation="odoo_meetings_meeting_event_calendar_event_rel")
     google_calendar_event_id = fields.Char()
     
 
