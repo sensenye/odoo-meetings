@@ -1,11 +1,5 @@
 <odoo>
   <data>
-    <!-- <template id="assets_frontend" name="account assets" inherit_id="web.assets_frontend">
-        <xpath expr="." position="inside">
-                <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
-            </xpath>
-    </template> -->
-
     <template id="assets_frontend" name="account assets" inherit_id="web.assets_frontend">
       <xpath expr="." position="inside">
         <link rel="stylesheet" href="/odoo_meetings/static/src/css/style.css"/>
@@ -20,35 +14,6 @@
         <script src="/odoo_meetings/static/src/js/copy_url.js" type="text/javascript" />
       </xpath>
     </template>
-    <!--
-        <template id="listing">
-          <ul>
-            <li t-foreach="objects" t-as="object">
-              <a t-attf-href="#{ root }/objects/#{ object.id }">
-                <t t-esc="object.display_name"/>
-              </a>
-            </li>
-          </ul>
-        </template>
-        <template id="object">
-          <h1><t t-esc="object.display_name"/></h1>
-          <dl>
-            <t t-foreach="object._fields" t-as="field">
-              <dt><t t-esc="field"/></dt>
-              <dd><t t-esc="object[field]"/></dd>
-            </t>
-          </dl>
-        </template>
--->
-
-    <!-- <template id="index">
-      <title>MeetingType</title>
-      <t t-foreach="meetingTypes" t-as="meetingType">
-        <p>
-          <p><t t-esc="meetingType.id"/> <t t-esc="meetingType.name"/></p>
-        </p>
-      </t>
-    </template> -->
 
     <template id="index">
       <t t-call="website.layout">
@@ -56,92 +21,44 @@
         <div class="oe_structure">
           <div class="container py-4">
             <h2>Programar una reunión</h2>
-
             <form>
-
-
               <div class="row">
                 <div class="col-lg-12">
                   <p>Selecciona un tipo de reunión:</p>
-
-                  <t t-set="meetingTypeSelectedIndex" t-value="0"/>
-
                   <select name="meetingTypeSelect" class="form-control" id="meetingTypeSelect" onchange="show_description(this)">
                     <t t-foreach="meetingTypes" t-as="meetingType">
                       <option>
                         <t t-esc="meetingType.name"/>
-                        <!-- <t t-esc="meetingType_index"/> -->
                       </option>
-                      <t t-set="meetingTypeSelectedIndex" t-value="5"/>
                     </t>
-
                   </select>
-
-                  <div id="meetingTypeDescription">
+                  <div id="meetingTypeDescription" style="margin-top:1rem">
                     <t t-foreach="meetingTypes" t-as="meetingType">
-                      <p t-if="meetingType_first" class="d-block">
-                        <t t-esc="meetingType.description"/>
-                        <t t-esc="meetingType.address"/>
+                      <div t-if="meetingType_first" class="d-block">
+                        <h5>Ubicación:</h5>
+                        <p><t t-esc="meetingType.address"/></p>
+                        <h5>Descripción:</h5>
+                        <p><t t-esc="meetingType.description"/></p>
                         <a t-attf-href="/odoo-meetings/#{meetingType.id}" class="btn btn-primary">
                           Siguiente
                         </a>
-                      </p>
-                      <p t-else="meetingType_first" class="d-none">
-                        <t t-esc="meetingType.description"/>
-                        <t t-esc="meetingType.address"/>
+                      </div>
+                      <div t-else="meetingType_first" class="d-none">
+                        <h5>Ubicación:</h5>
+                        <p><t t-esc="meetingType.address"/></p>
+                        <h5>Descripción:</h5>
+                        <p><t t-esc="meetingType.description"/></p>
                         <a t-attf-href="/odoo-meetings/#{meetingType.id}" class="btn btn-primary">
                           Siguiente
                         </a>
-                      </p>
+                      </div>
                     </t>
                   </div>
-
-
                 </div>
-
-                <!-- <div class="col-lg-12">
-                  <div class="form-group">
-                    <label for="date" class="control-label">Fecha</label>
-                    <input type="date" name="date" min="2018-01-01" max="2018-12-31" required="required" class="form-control o_website_form_date" />
-                  </div>
-                  <div class="form-group">
-                    <label for="hour" class="control-label">Hora</label>
-                    <input type="text" name="hour" required="required"/>
-                  </div>
-                  <div class="form-group">
-                    <label for="name" class="control-label">Nombre</label>
-                    <input type="text" name="name" required="required"/>
-                  </div>
-                  <div class="form-group">
-                    <label for="email" class="control-label">Fecha</label>
-                    <input type="email" name="email" required="required"/>
-                  </div>
-                  <div class="form-group">
-                    <label for="comments" class="control-label">Comentarios</label>
-                    <input type="textarea" name="comments" required="required"/>
-                  </div> -->
-
-
-                <!-- <button type="submit" class="btn btn-primary">Enviar</button> -->
-                <!-- </div> -->
               </div>
             </form>
-
-
-
-            <!-- <t t-foreach="meetingTypes" t-as="meetingType">
-                <p>
-                  <t t-esc="meetingType.description"/>
-                  <div t-field="meetingType.start_date"/>
-                </p>
-              </t>             -->
-
-
           </div>
-
         </div>
-
-
       </t>
     </template>
 
@@ -151,45 +68,7 @@
         <div class="oe_structure">
           <div class="container py-4">
             <h2>Seleccionar fecha y hora</h2>
-
             <form action="/odoo-meetings/submit">
-              <!-- <div class="row">
-                <div class="col-lg-12">
-                  <p>Selecciona la fecha y hora que prefieras para el tipo de reunión "<t t-esc="meetingType.name"/>"</p>
-                  <p>
-                    <t t-esc="meetingType.duration"/>
-                  </p>
-                  <p>
-                    <t t-esc="meetingType.start_date"/>
-                  </p>
-                  <p>
-                    <t t-esc="meetingType.end_date"/>
-                  </p>
-                  <p>
-                    <t t-esc="meetingTypeId"/>
-                  </p>
-                  <t t-foreach="employees" t-as="employee">
-                    <p>
-                      <t t-esc="employee.id"/>
-                      <t t-esc="employee.name"/>
-                    </p>
-                  </t>
-                  <t t-foreach="resources" t-as="res">
-                    <p>
-                      <t t-esc="res.calendar_id.name"/>
-                      <t t-esc="employee.name"/>
-                    </p>
-                  </t>
-                  <t t-foreach="monday" t-as="hours">
-                    <t t-foreach="hours" t-as="hour">
-                      <p>
-                        <t t-esc="hour"/>
-                      </p>
-                    </t>
-                  </t>
-                </div>
-              </div> -->
-
               <p>Selecciona la fecha y hora que prefieras para el tipo de reunión "<t t-esc="meetingType.name"/>". La duración es de <t t-esc="meetingType.duration"/> minutos.</p>
               <div class="row">
                 <div class="col-lg-6">

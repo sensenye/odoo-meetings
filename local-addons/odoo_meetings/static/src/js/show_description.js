@@ -37,7 +37,7 @@ function show_description(elem) {
   // console.log(selectedIndex);
 
   var container = document.querySelector("#meetingTypeDescription");
-  var descripArray = container.querySelectorAll("p");
+  var descripArray = container.querySelectorAll("div");
 
   descripArray.forEach((desc, index) => {
     if (desc.classList.contains("d-block"))
