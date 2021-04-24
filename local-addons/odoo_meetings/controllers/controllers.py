@@ -313,13 +313,16 @@ class OdooMeetings(http.Controller):
 
             if -1 == assigned_employee_id:  # No employees available
                 return http.request.render('odoo_meetings.form_failure', {})
-            
 
-            # # Save last_employee to the meeting_type table
-            # query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
-            # # Because models use the same cursor and the Environment holds various caches, these caches must be invalidated when altering the database in raw SQL, or further uses of models may become incoherent
-            # http.request.env['odoo_meetings.meeting_type'].invalidate_cache()
-            # http.request.env.cr.execute(query)
+            employee_email = odoo_meetings_meeting_type.employees.search([
+                ['id', '=', assigned_employee_id],
+            ]).work_email
+
+            # Save last_employee to the meeting_type table
+            query = f"UPDATE odoo_meetings_meeting_type SET last_employee = {assigned_employee_id} WHERE id = {meetingTypeId}"
+            # Because models use the same cursor and the Environment holds various caches, these caches must be invalidated when altering the database in raw SQL, or further uses of models may become incoherent
+            http.request.env['odoo_meetings.meeting_type'].invalidate_cache()
+            http.request.env.cr.execute(query)
 
             # The user login info is stored on the res_users_id
             res_users_id = self.get_res_users_id(
@@ -343,31 +346,6 @@ class OdooMeetings(http.Controller):
 
             print('timestamp: \n', start_date_time_obj, ' - ', end_date_time_obj)
 
-            # Save calendar event to DB. Employees will be able to see them on the Odoo Calendar Module
-            # calendar_event = http.request.env['calendar.event'].create({
-            #     'name': 'Reunión con ' + kw.get('name'),
-            #     'start': start_date_time_obj,
-            #     'stop': end_date_time_obj,
-            #     'start_date': kw.get('date'),
-            #     'stop_date': kw.get('date'),
-            #     'privacy': 'public',
-            #     'show_as': 'busy',
-            #     'user_id': res_users_id, # Responsible
-            #     'partner_id': [(4, partner_id, 0)], # Responsible Contact
-            #     'partner_ids': [(4, partner_id, 0)] # Attendees
-            # })
-
-             # Create a Google Calendar event
-            client_event_name = 'Reunión con ' + self.get_employee_name(assigned_employee_id, resource_resource)
-
-            start_date_time_with_tz = start_date_time_obj.replace(tzinfo=pytz.utc)
-            end_date_time_with_tz = end_date_time_obj.replace(tzinfo=pytz.utc)
-            # Google calendar date time uses RFC 3339 format
-            start_date_time_with_tz_iso = start_date_time_with_tz.isoformat()
-            end_date_time_with_tz_iso = end_date_time_with_tz.isoformat()
-
-            google_calendar_event_id = self.create_google_calendar_event(client_event_name, meetingDescription, start_date_time_with_tz_iso, end_date_time_with_tz_iso, attendeeEmail, meetingLocation, meetingAddress)
-
             # Save meeting event to db
             meeting = http.request.env['odoo_meetings.meeting_event'].create({
                 'assistant_name': kw.get('name'),
@@ -378,7 +356,56 @@ class OdooMeetings(http.Controller):
                 # 'state': 'TODO: add state',
                 'meeting_type': [(4, kw.get('meetingTypeId'), 0)],
                 'employee': [(4, assigned_employee_id, 0)],
-                'google_calendar_event_id': google_calendar_event_id
+                # 'google_calendar_event_id': google_calendar_event_id
+            })
+
+            # Google Calendar event parameters
+            client_event_name = 'Reunión con ' + self.get_employee_name(assigned_employee_id, resource_resource)
+
+            start_date_time_with_tz = start_date_time_obj.replace(tzinfo=pytz.utc)
+            end_date_time_with_tz = end_date_time_obj.replace(tzinfo=pytz.utc)
+            # Google calendar date time uses RFC 3339 format
+            start_date_time_with_tz_iso = start_date_time_with_tz.isoformat()
+            end_date_time_with_tz_iso = end_date_time_with_tz.isoformat()
+
+            base_url = http.request.env['ir.config_parameter'].get_param('web.base.url')
+            delete_event_url = base_url + '/odoo-meetings/event/' + str(meeting.id)
+            google_calendar_event_description = meetingDescription + '\n\nSi quieres cancelar la reunión, haz clic en el siguiente enlace: ' + delete_event_url
+            # print(google_calendar_event_description)
+            
+            # Create Google Calendar event
+            google_calendar_event = self.create_google_calendar_event(client_event_name, google_calendar_event_description, start_date_time_with_tz_iso, end_date_time_with_tz_iso, attendeeEmail, employee_email, meetingLocation, meetingAddress)
+
+            google_calendar_event_id = google_calendar_event.get('id')
+
+            # Update google_calendar_event_id on the meeting
+            meeting.write({ 'google_calendar_event_id': google_calendar_event_id })
+
+            google_meet_msg = '\n'
+            
+            # If the meeting is on Google Meet, save the link in the Odoo Calendar of the employee
+            if (meetingLocation == 'google_meet'):
+                google_meet_url = google_calendar_event.get('conferenceData').get('entryPoints')[0].get('label')
+                google_meet_msg = 'Para conectarte a la reunión de Google Meet, haz clic en el siguiente enlace: ' + google_meet_url + '\n'
+
+            odoo_calendar_event_description = meetingDescription + '\n' + google_meet_msg + 'Si quieres cancelar la reunión, haz clic en el siguiente enlace: ' + delete_event_url
+
+            # print(odoo_calendar_event_description)
+
+            # Save calendar event to DB. Employees will be able to see them on the Odoo Calendar Module
+            calendar_event = http.request.env['calendar.event'].create({
+                'name': 'Reunión con ' + kw.get('name'),
+                'start': start_date_time_obj,
+                'stop': end_date_time_obj,
+                'start_date': kw.get('date'),
+                'stop_date': kw.get('date'),
+                'privacy': 'public',
+                'show_as': 'busy',
+                'user_id': res_users_id, # Responsible
+                'partner_id': [(4, partner_id, 0)], # Responsible Contact
+                'partner_ids': [(4, partner_id, 0)], # Attendees
+                'location': meetingAddress,
+                'description': odoo_calendar_event_description
             })
 
         return http.request.render('odoo_meetings.form_success', {})
@@ -401,8 +428,6 @@ class OdooMeetings(http.Controller):
                         if (calendar.calendar_id.id == res.calendar_id.id):
                             # Check if employee is working on the day and time selected by user
                             if (int(calendar.dayofweek) == int(selectedDay) and calendar.hour_from <= selectedTime <= calendar.hour_to):
-                                # TODO: Check if employee is busy on the day and time selected (check if it has another event on the calendar)
-                                # if (self.isBusy(employee_id, ))
                                 print(calendar.dayofweek, "\t", calendar.name,
                                       "\t", calendar.hour_from, " - ", calendar.hour_to)
 
@@ -436,8 +461,10 @@ class OdooMeetings(http.Controller):
             print(event.start.date(), ' | ', event_start_time_decimal,
                   ' - ', event_end_time_decimal)
             print(event.partner_id.name, '\n')
-            if (start_time_selected_decimal >= event_start_time_decimal or end_time_selected_decimal <= event_end_time_decimal):
-                return False
+            if (start_time_selected_decimal > event_end_time_decimal or end_time_selected_decimal < event_start_time_decimal):
+                continue # Need to check all events
+            else:
+                return False # Employee not available
         return True
 
     def get_partner_id(self, assigned_employee_id, resource_resource):
@@ -454,6 +481,11 @@ class OdooMeetings(http.Controller):
         for res in resource_resource:
             if (employee_id == res.id):  # Get employee
                 return res.name
+
+    def get_employee_email(self, employee_id, resource_resource):
+        for res in resource_resource:
+            if (employee_id == res.id):  # Get employee
+                return res.email
 
     def local_time_decimal(self, timestamp):
         # Odoo stores date in UTC format, so it is neccessary to convert it into local format
@@ -510,7 +542,7 @@ class OdooMeetings(http.Controller):
 
         return service
 
-    def create_google_calendar_event(self, event_name, meetingDescription, start_date_time, end_date_time, attendeeEmail, meetingLocation, meetingAddress):
+    def create_google_calendar_event(self, event_name, meetingDescription, start_date_time, end_date_time, attendeeEmail, employeeEmail, meetingLocation, meetingAddress):
 
         service = self.get_google_calendar_service()
 
@@ -545,7 +577,8 @@ class OdooMeetings(http.Controller):
             'attendees': [
                 {'email': 'sensen.yechen@gmail.com'},
                 # {'email': '100349203@alumnos.uc3m.es'},
-                # {'email': attendeeEmail}
+                # {'email': attendeeEmail},
+                # {'email': employeeEmail}
             ],
             'reminders': {
                 'useDefault': False,
@@ -563,7 +596,8 @@ class OdooMeetings(http.Controller):
             sendNotifications=True,
             sendUpdates='all',
             body=event).execute()
-        return event.get('id')
+        # return event.get('id')
+        return event
         # print('Event created: ', event.get('htmlLink'))
 
     @http.route('/odoo-meetings/event/<model("odoo_meetings.meeting_event"):obj>/', auth='public', website=True)
