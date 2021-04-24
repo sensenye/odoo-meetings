@@ -31,13 +31,13 @@
                                 <field name="description"/>
                             </group>
                         </page>
-                        <page string="Fechas, duración y límite">
+                        <page string="Fechas y duración">
                             <p>Los usuarios pueden programar reuniones:</p>
                             <group>
-                                <field name="duration"/>
-                                <field name="daily_limit"/>
                                 <field name="start_date"/>
                                 <field name="end_date"/>
+                                <field name="duration"/>
+                                <!-- <field name="daily_limit"/> -->
                             </group>
                         </page>
                         <page string="Empleados">

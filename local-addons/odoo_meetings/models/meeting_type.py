@@ -28,7 +28,7 @@ class MeetingType(models.Model):
     #     ('infinite', 'De manera indefinida'),
     # ], default='google_meet', required=True)
     duration = fields.Integer(string="Duración *", required=True, default=30)
-    daily_limit = fields.Integer(string="Límite diario *", required=True)
+    # daily_limit = fields.Integer(string="Límite diario *", required=True)
     url = fields.Char()
 
     start_date = fields.Date(string='Fecha de inicio *', default=fields.Date.today())
