@@ -26,6 +26,7 @@
 
     # always loaded
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         # 'views/views.xml',
         'views/templates.xml',
@@ -35,7 +36,7 @@
         'static/src/css/style.css'
     ],
     # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ]
+    # 'demo': [
+    #     'demo/demo.xml',
+    # ]
 }

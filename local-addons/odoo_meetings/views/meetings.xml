@@ -108,12 +108,12 @@
                                 </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="width: max-content;">
                                     <!-- Edit and Delete actions, if available: -->
-                                    <div t-if="widget.editable">
+                                    <div>
 
-                                        <li>
+                                        <li t-if="widget.editable">
                                             <a type="edit">Editar</a>
                                         </li>
-                                        <li>
+                                        <li t-if="widget.deletable">
                                             <a type="delete">Borrar</a>
                                         </li>
                                         <li>
