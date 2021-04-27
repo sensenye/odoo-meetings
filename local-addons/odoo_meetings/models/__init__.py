@@ -2,4 +2,4 @@
 
 from . import meeting_type
 from . import meeting
-from . import user
+# from . import user
