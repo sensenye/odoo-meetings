@@ -26,11 +26,13 @@
 
     # always loaded
     'data': [
-        'security/security.xml',
+        'security/meeting_type_groups.xml',
+        'security/calendar_event_security.xml',
         'security/ir.model.access.csv',
-        # 'views/views.xml',
-        'views/templates.xml',
-        'views/meetings.xml',
+        'views/assets.xml',
+        'views/meeting_event_templates.xml',
+        'views/meeting_type_templates.xml',
+        'views/meeting_type_views.xml',
     ],
     'css': [
         'static/src/css/style.css'

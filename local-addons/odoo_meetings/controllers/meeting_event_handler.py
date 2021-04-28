@@ -52,7 +52,7 @@ def meeting_event_submit(kw):
     employee_attendance_order += employee_attendance_recent
 
     # Print to file
-    with open('employees.txt', 'w') as f:
+    with open('meeting_event_handler.txt', 'w') as f:
         # Change the standard output to the file we created.
         sys.stdout = f
         print('\n', employee_attendance_order)

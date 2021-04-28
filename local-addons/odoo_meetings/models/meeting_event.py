@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api
 
-class Meeting(models.Model):
+class MeetingEvent(models.Model):
     _name = 'odoo_meetings.meeting_event'
     _description = "Meeting Event"
 
@@ -11,23 +11,7 @@ class Meeting(models.Model):
     comments = fields.Text(string="Comentarios", required=True)
     date = fields.Date(string="Fecha", required=True)
     hour = fields.Char(string="Hora", required=True)
-    # state = fields.Char(string="Estado", required=True)
     meeting_type = fields.Many2many('odoo_meetings.meeting_type', string="Tipo de reunión", relation="odoo_meetings_meeting_event_meeting_type_rel")
     employee = fields.Many2many('hr.employee.public', string="Empleado", relation="odoo_meetings_meeting_event_employee_rel")
     calendar_event = fields.Many2many('calendar.event', string="Evento de calendario", relation="odoo_meetings_meeting_event_calendar_event_rel")
     google_calendar_event_id = fields.Char()
-    
-
-# class odoo_meetings(models.Model):
-#     _name = 'odoo_meetings.odoo_meetings'
-#     _description = 'odoo_meetings.odoo_meetings'
-
-#     name = fields.Char()
-#     value = fields.Integer()
-#     value2 = fields.Float(compute="_value_pc", store=True)
-#     description = fields.Text()
-#
-#     @api.depends('value')
-#     def _value_pc(self):
-#         for record in self:
-#             record.value2 = float(record.value) / 100

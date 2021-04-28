@@ -1,23 +1,7 @@
 <odoo>
-
-    <record id="view_calendar_event_search_external" model="ir.ui.view">
-        <field name="name">calendar.event.search.expand</field>
-        <field name="model">calendar.event</field>
-         <!-- <field name="model">odoo_meetings.meeting_type</field> -->
-        <field name="inherit_id" ref="calendar.view_calendar_event_search"/>
-        <field name="arch" type="xml">
-            <xpath expr="//filter[@name='mymeetings']" position="after">
-                <separator/>
-                <!-- <filter string="Odoo Meetings" help="Odoo Meetings" name="myodoomeetings" domain="[('odoo_meetings.meeting_event.name', '=', 'Tipo Reunion 1')]"/> -->
-                <separator/>
-            </xpath>
-        </field>
-    </record>
-
-    <record model="ir.ui.view" id="meeting_form_view">
-        <field name="name">meeting.form</field>
+    <record id="meeting_type_view_form" model="ir.ui.view">
+        <field name="name">meeting_type_view_form</field>
         <field name="model">odoo_meetings.meeting_type</field>
-        <!-- <field name="view_mode">form</field> -->
         <field name="arch" type="xml">
             <form string="Meeting Form">
                 <sheet>
@@ -37,7 +21,6 @@
                                 <field name="start_date"/>
                                 <field name="end_date"/>
                                 <field name="duration"/>
-                                <!-- <field name="daily_limit"/> -->
                             </group>
                         </page>
                         <page string="Empleados">
@@ -60,47 +43,30 @@
         </field>
     </record>
 
-    <record model="ir.ui.view" id="meeting_tree_view">
-        <field name="name">meeting.tree</field>
+    <record id="meeting_type_view_tree" model="ir.ui.view">
+        <field name="name">meeting_type_view_tree</field>
         <field name="model">odoo_meetings.meeting_type</field>
-        <!-- <field name="view_mode">form</field> -->
         <field name="arch" type="xml">
             <form string="Meeting Tree view">
                 <sheet>
                     <group>
                         <field name="name"/>
-                        <!-- <field name="description"/>
-                        <field name="email"/>
-                        <field name="mobile"/> -->
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <record model="ir.ui.view" id="meeting_kanban_view">
-        <field name="name">meeting.kanban</field>
+    <record id="meeting_type_view_kanban" model="ir.ui.view">
+        <field name="name">meeting_type_view_kanban</field>
         <field name="model">odoo_meetings.meeting_type</field>
-        <!-- <field name="view_mode">form</field> -->
         <field name="arch" type="xml">
             <kanban class="o_res_partner_kanban">
                 <field name="name"/>
                 <field name="location"/>
-                <!-- <field name="description"/>
-                <field name="email"/>
-                <field name="mobile"/> -->
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
-                            <!-- 
-                            When the card is clicked, the form view appears
-                            <div t-attf-class="oe_kanban_global_click">
-                        -->
-
-                            <!-- <div class="o_kanban_image">
-                                    <img alt="Avatar" t-att-src="kanban_image('res.partners', 'image_medium',record.id.raw_value)"/>
-                                </div> -->
-
                             <div class="card-options-container">
                                 <!-- Top-right drop down menu here... -->
                                 <a class="o_kanban_manage_toggle_button" data-toggle="dropdown" href="#">
@@ -134,13 +100,6 @@
                                 <p>
                                     <field name="location"/> | <field name="address"/>
                                 </p>
-                                
-                                <!-- <div t-if="record.mobile.value">
-                                    <t t-esc="record.mobile.value"/>
-                                </div>
-                                <div t-if="record.email.value">
-                                    <t t-esc="record.email.value"/>
-                                </div> -->
                                 <div class="text-center pt-4">
                                     <button class="btn btn-primary" name="open_calendar" type="object">
                                     Nº reuniones: <field name="num_meetings"/> 
@@ -155,53 +114,36 @@
     </record>
 
 
-    <record model="ir.actions.act_window" id="odoo_meetings_form_action">
-        <field name="name">Reunion</field>
+    <record id="meeting_type_action_view_form" model="ir.actions.act_window">
+        <field name="name">Odoo Meetings</field>
         <field name="res_model">odoo_meetings.meeting_type</field>
-        <!-- <field name="type">ir.actions.act_window</field> -->
         <field name="view_mode">form</field>
-        <field name="view_id" ref="meeting_form_view"/>
+        <field name="view_id" ref="meeting_type_view_form"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Create the first meeting
             </p>
         </field>
     </record>
 
-    <record model="ir.actions.act_window" id="odoo_meetings_view_action">
-        <field name="name">Reunion</field>
-        <field name="res_model">odoo_meetings.meeting_type</field>
-        <!-- <field name="type">ir.actions.act_window</field> -->
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="meeting_tree_view"/>
-    </record>
-
-    <record model="ir.actions.act_window" id="odoo_meeting_type_kanban_action">
+    <record id="meeting_type_action_view_tree" model="ir.actions.act_window">
         <field name="name">Odoo Meetings</field>
         <field name="res_model">odoo_meetings.meeting_type</field>
-        <!-- <field name="type">ir.actions.act_window</field> -->
-        <field name="view_mode">kanban,form</field>
-        <field name="view_id" ref="meeting_kanban_view"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="meeting_type_view_tree"/>
     </record>
 
+    <record id="meeting_type_action_view_kanban" model="ir.actions.act_window">
+        <field name="name">Odoo Meetings</field>
+        <field name="res_model">odoo_meetings.meeting_type</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="meeting_type_view_kanban"/>
+    </record>
 
-    <!-- top level menu: no parent -->
-
-    <!-- <menuitem id="main_odoo_meetings_menu" name="Meetings" action="odoo_meeting_type_kanban_action" sequence="-2" groups="base.group_user"/> -->
-
-    <!-- A first level in the left side menu is needed
-             before using action= attribute -->
-    <menuitem id="odoo_meetings_menu" name="Tipos de reuniones" parent="calendar.mail_menu_calendar" action="odoo_meeting_type_kanban_action" />
-    <!-- the following menuitem should appear *after*
-             its parent openacademy_menu and *after* its
-             action course_list_action -->
-    <!-- 
-        <menuitem id="meetings_menu" name="Reuniones 2" parent="odoo_meetings_menu" action="odoo_meetings_list_action"/>
-                   -->
-    <!-- Full id location: action="openacademy.course_list_action"
-             It is not required when it is the same module -->
+    <!-- Add menu to Odoo Calendar -->
+    <menuitem id="meeting_type_menu" name="Odoo Meetings" parent="calendar.mail_menu_calendar" action="meeting_type_action_view_kanban" />
 
     <!-- Add menu item to the website header -->
-    <record id="odoo_meetings_page_link" model="website.menu">
+    <record id="meeting_type_menu_website" model="website.menu">
         <field name="name">Reuniones</field>
         <field name="url">/odoo-meetings/</field>
         <field name="parent_id" ref="website.main_menu" />

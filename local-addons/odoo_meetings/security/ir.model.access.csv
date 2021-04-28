@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 meeting_type_read_all,meeting_type_read_all,model_odoo_meetings_meeting_type,base.group_user,1,0,0,0
-meeting_type_all,meeting_type_all,model_odoo_meetings_meeting_type,odoo_meetings_admin,1,1,1,1
+meeting_type_all,meeting_type_all,model_odoo_meetings_meeting_type,odoo_meetings_group_admin,1,1,1,1
 meeting_event_all,meeting_event_read_all,model_odoo_meetings_meeting_event,base.group_user,1,1,1,1
