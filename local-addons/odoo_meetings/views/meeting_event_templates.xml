@@ -1,6 +1,6 @@
 <odoo>
   <data>
-    <template id="select_time">
+    <template id="select_time" name="Seleccionar fecha y hora">
       <t t-call="website.layout">
         <t t-set="title">Odoo Meetings</t>
         <div class="oe_structure">
@@ -106,7 +106,7 @@
     </t>
   </template>
 
-  <template id="form_success" name="Form Successfully Submitted">
+  <template id="form_success" name="Reunión programada con éxito">
     <t t-call="website.layout">
       <div id="wrap">
         <div class="container">
@@ -120,7 +120,7 @@
     </t>
   </template>
 
-  <template id="delete_event_success" name="Form Successfully Submitted">
+  <template id="delete_event_success" name="Reunión cancelada con éxito">
     <t t-call="website.layout">
       <div id="wrap">
         <div class="container py-5">
@@ -136,7 +136,7 @@
     </t>
   </template>
 
-  <template id="form_failure" name="Form Error">
+  <template id="form_failure" name="Oops, nadie disponible">
     <t t-call="website.layout">
       <div id="wrap">
         <div class="container">
@@ -151,7 +151,7 @@
     </t>
   </template>
 
-  <template id="update_delete_event" name="Update event">
+  <template id="update_delete_event" name="Reunión">
     <t t-call="website.layout">
       <div id="wrap">
         <div class="container py-4">
