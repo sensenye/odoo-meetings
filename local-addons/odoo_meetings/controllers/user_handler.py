@@ -2,6 +2,7 @@ from odoo import http
 import sys
 import pandas
 import datetime
+import pytz
 
 def get_resource_resource(odoo_meetings_meeting_type):
     # List of employees from the hr.employee table that are assigned to the meeting type selected by user
@@ -56,9 +57,9 @@ def get_availability(resource_resource, resource_calendar_attendance_sorted, mee
         key='name', reverse=False)
 
     # Print to file
-    with open('getAvailability().txt', 'w') as f:
+    # with open('getAvailability().txt', 'w') as f:
         # Change the standard output to the file we created.
-        sys.stdout = f
+        # sys.stdout = f
         # for res in resource_resource:
         #     # Employee name + type of working hours name
         #     print(res.name, "\t", res.calendar_id.name)
@@ -69,104 +70,104 @@ def get_availability(resource_resource, resource_calendar_attendance_sorted, mee
         #                   " - ", calendar.hour_to)
         # print("\n", "\n")
         
-        # Get all type of working hours
-        for calendar in resource_calendar_attendance_sorted:
-            hour_from.append(calendar.hour_from)
-            hour_to.append(calendar.hour_to)
-            calendar_id.append(calendar.calendar_id.id)
-            dayofweek.append(calendar.dayofweek)
-            type_name.append(calendar.name)
-            print(calendar.calendar_id.name, "\t", calendar.name,
-                  "\t", calendar.hour_from, " - ", calendar.hour_to)
+    # Get all type of working hours
+    for calendar in resource_calendar_attendance_sorted:
+        hour_from.append(calendar.hour_from)
+        hour_to.append(calendar.hour_to)
+        calendar_id.append(calendar.calendar_id.id)
+        dayofweek.append(calendar.dayofweek)
+        type_name.append(calendar.name)
+        print(calendar.calendar_id.name, "\t", calendar.name,
+                "\t", calendar.hour_from, " - ", calendar.hour_to)
 
-        # Create dictionary with all needed data
-        myDict["calendar_id"] = calendar_id
-        myDict["type_name"] = type_name
-        myDict["dayofweek"] = dayofweek
-        myDict["hour_from"] = hour_from
-        myDict["hour_to"] = hour_to
+    # Create dictionary with all needed data
+    myDict["calendar_id"] = calendar_id
+    myDict["type_name"] = type_name
+    myDict["dayofweek"] = dayofweek
+    myDict["hour_from"] = hour_from
+    myDict["hour_to"] = hour_to
 
-        print("\n", myDict)
+    print("\n", myDict)
 
-        # Create dataframe from Pandas library
-        df = pandas.DataFrame(myDict)
+    # Create dataframe from Pandas library
+    df = pandas.DataFrame(myDict)
 
-        print("\n", df)
+    print("\n", df)
 
-        df_dayofweek = df.groupby("dayofweek")
-        print("\n", df_dayofweek.first())
-        print("\n", df_dayofweek.get_group('0'))
+    df_dayofweek = df.groupby("dayofweek")
+    print("\n", df_dayofweek.first())
+    print("\n", df_dayofweek.get_group('0'))
 
-        # Get min hour from and max hour to for each type and for each day. This will be the availability of the entire team
-        df_min_hour_from_by_type = df.groupby(
-            ['type_name'], sort=False).hour_from.min()
-        df_max_hour_to_by_type = df.groupby(
-            ['type_name'], sort=False).hour_to.max()
+    # Get min hour from and max hour to for each type and for each day. This will be the availability of the entire team
+    df_min_hour_from_by_type = df.groupby(
+        ['type_name'], sort=False).hour_from.min()
+    df_max_hour_to_by_type = df.groupby(
+        ['type_name'], sort=False).hour_to.max()
 
-        # Create list from dataframe
-        list_min_hour_from_by_type = df_min_hour_from_by_type.values.tolist()
-        list_max_hour_to_by_type = df_max_hour_to_by_type.values.tolist()
+    # Create list from dataframe
+    list_min_hour_from_by_type = df_min_hour_from_by_type.values.tolist()
+    list_max_hour_to_by_type = df_max_hour_to_by_type.values.tolist()
 
-        print("\ndf_min_hour_from_by_type \n", df_min_hour_from_by_type)
-        print("\nlist_min_hour_from_by_type \n",
-              list_min_hour_from_by_type)
-        print("\ndf_max_hour_to_by_type \n", df_max_hour_to_by_type)
-        print("\nlist_max_hour_to_by_type \n", list_max_hour_to_by_type)
+    print("\ndf_min_hour_from_by_type \n", df_min_hour_from_by_type)
+    print("\nlist_min_hour_from_by_type \n",
+            list_min_hour_from_by_type)
+    print("\ndf_max_hour_to_by_type \n", df_max_hour_to_by_type)
+    print("\nlist_max_hour_to_by_type \n", list_max_hour_to_by_type)
 
-        # Add min hour from and max hour to to the list
-        for min_value, max_value in zip(list_min_hour_from_by_type, list_max_hour_to_by_type):
-            availability.append(min_value)
-            availability.append(max_value)
+    # Add min hour from and max hour to to the list
+    for min_value, max_value in zip(list_min_hour_from_by_type, list_max_hour_to_by_type):
+        availability.append(min_value)
+        availability.append(max_value)
 
-        print("\n\nAVAILABILITY:\n", availability)
+    print("\n\nAVAILABILITY:\n", availability)
 
-        print("\n\nDAYS:\n", myDict["dayofweek"])
+    print("\n\nDAYS:\n", myDict["dayofweek"])
 
-        # Get unique values of dayofweek
-        unique_dayofweek = df.groupby(
-            "dayofweek").dayofweek.min().values.tolist()
-        print("\n\nDAYS:\n", unique_dayofweek)
+    # Get unique values of dayofweek
+    unique_dayofweek = df.groupby(
+        "dayofweek").dayofweek.min().values.tolist()
+    print("\n\nDAYS:\n", unique_dayofweek)
 
-        # Save availability on a dictionary. Each key will represent a day (0 will be monday, 1 tuesday and so on until 6 which will be sunday) and it will store a list with the availability. The format will be:
-        # availabilityDict {
-        #     "0": [hour_from_morning, hour_to_morning, hour_from_afternoon, hour_to_afternoon]
-        #     "1": [hour_from_morning, hour_to_morning, hour_from_afternoon, hour_to_afternoon]
-        # }
-        for day in unique_dayofweek:
-            hours_per_day = []
-            for i, hours in enumerate(availability, start=temp):
-                # Get 4 hours (morning start time and end time & afternoon start time and end time)
-                if ((i == temp) or (i % 4 != 0)):
-                    # hours_per_day.append(availability[i])
-                    if ((i+1) < len(availability) and i % 2 == 0):
-                        hours_per_day.append(get_hours(
-                            availability[i], availability[i+1], meetingDuration))
-                else:
-                    # Save to the corresponding day
-                    temp += 4
-                    availabilityDict[day] = hours_per_day
-                    break
+    # Save availability on a dictionary. Each key will represent a day (0 will be monday, 1 tuesday and so on until 6 which will be sunday) and it will store a list with the availability. The format will be:
+    # availabilityDict {
+    #     "0": [hour_from_morning, hour_to_morning, hour_from_afternoon, hour_to_afternoon]
+    #     "1": [hour_from_morning, hour_to_morning, hour_from_afternoon, hour_to_afternoon]
+    # }
+    for day in unique_dayofweek:
+        hours_per_day = []
+        for i, hours in enumerate(availability, start=temp):
+            # Get 4 hours (morning start time and end time & afternoon start time and end time)
+            if ((i == temp) or (i % 4 != 0)):
+                # hours_per_day.append(availability[i])
+                if ((i+1) < len(availability) and i % 2 == 0):
+                    hours_per_day.append(get_hours(
+                        availability[i], availability[i+1], meetingDuration))
+            else:
+                # Save to the corresponding day
+                temp += 4
+                availabilityDict[day] = hours_per_day
+                break
 
-        print("\n\nAVAILABILITY DICTIONARY:\n", availabilityDict)
-        # for a in availabilityDict:
-        #     for b in a[b]
-        #     print("\n\n", b)
+    print("\n\nAVAILABILITY DICTIONARY:\n", availabilityDict)
+    # for a in availabilityDict:
+    #     for b in a[b]
+    #     print("\n\n", b)
 
-    sys.stdout = original_stdout  # Reset the standard output to its original value
+    # sys.stdout = original_stdout  # Reset the standard output to its original value
     return availabilityDict
 
 def get_hours(min_value, max_value, duration):
     original_stdout = sys.stdout
     hours = []
     value = min_value
-    with open('getHours().txt', 'w') as f:
+    # with open('getHours().txt', 'w') as f:
         # Change the standard output to the file we created.
-        sys.stdout = f
-        while value <= max_value:
-            hours.append(decimal_to_time(value))
-            value += (duration / 60)
-        print(hours)
-        sys.stdout = original_stdout
+        # sys.stdout = f
+    while value <= max_value:
+        hours.append(decimal_to_time(value))
+        value += (duration / 60)
+    print(hours)
+        # sys.stdout = original_stdout
     return hours
 
 def get_first_available_employee(employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDate, selectedDay, selectedTime, meetingDuration):
@@ -253,7 +254,7 @@ def local_time_decimal(timestamp):
         local_timestamp_str, '%Y-%m-%d %H:%M:%S')
 
     # Local time
-    local_time_decimal = user_handler.time_to_decimal(
+    local_time_decimal = time_to_decimal(
         str(local_timestamp_obj.time()))
 
     return local_time_decimal
