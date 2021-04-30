@@ -91,6 +91,7 @@ There is a demo version available on https://odoomeetings.tk. If you want access
 
 How to install Odoo 14 on Amazon Web Services EC2 instance
 ---------------------------------------------------
+
 To install Odoo 14 on AWS EC2 Ubuntu instance you can follow this guide: [Guide to deploy Odoo to AWS EC2 instance](https://www.cybrosys.com/blog/how-to-install-odoo-11-on-amazon-ec2). This guide refers to Odoo 11, so if you want to install version 14, on step 14 you must run:
 
 ```
@@ -98,6 +99,7 @@ wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
 echo "deb http://nightly.odoo.com/14.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
 apt-get update && apt-get install odoo
 ```
+The odoo installation will be located in: `/usr/lib/python3/dist-packages/odoo`.
 
 How to deploy the custom module to AWS EC2
 ------------------------------------------
