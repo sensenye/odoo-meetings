@@ -70,7 +70,7 @@
                             <div class="card-options-container">
                                 <!-- Top-right drop down menu here... -->
                                 <a class="o_kanban_manage_toggle_button" data-toggle="dropdown" href="#">
-                                    <i class="fa fa-ellipsis-v"/>
+                                    <i class="fa fa-ellipsis-v" title="More options"/>
                                 </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="width: max-content;">
                                     <!-- Edit and Delete actions, if available: -->
