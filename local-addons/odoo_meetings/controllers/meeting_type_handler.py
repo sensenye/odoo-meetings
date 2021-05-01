@@ -51,9 +51,9 @@ def meeting_type_details_index(obj):
     })
 
 def get_meeting_type(meetingTypeId):
-    return http.request.env['odoo_meetings.meeting_type'].search([
+    return http.request.env['odoo_meetings.meeting_type'].sudo().search([
         ['id', '=', meetingTypeId]
     ])
 
 def get_all_meeting_type():
-    return http.request.env['odoo_meetings.meeting_type'].search([])
+    return http.request.env['odoo_meetings.meeting_type'].sudo().search([])

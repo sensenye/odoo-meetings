@@ -68,7 +68,7 @@ def meeting_event_submit(kw):
     if -1 == assigned_employee_id:  # No employees available
         return http.request.render('odoo_meetings.form_failure', {})
 
-    employee_email = odoo_meetings_meeting_type.employees.search([
+    employee_email = odoo_meetings_meeting_type.employees.sudo().search([
         ['id', '=', assigned_employee_id],
     ]).work_email
 
@@ -101,7 +101,7 @@ def meeting_event_submit(kw):
     print('timestamp: \n', start_date_time_obj, ' - ', end_date_time_obj)
 
     # Save meeting event to db
-    meeting = http.request.env['odoo_meetings.meeting_event'].create({
+    meeting = http.request.env['odoo_meetings.meeting_event'].sudo().create({
         'assistant_name': kw.get('name'),
         'assistant_email': kw.get('email'),
         'comments': kw.get('comments'),
@@ -193,13 +193,13 @@ def delete_meeting_event(meetingEvent):
     google_calendar_handler.delete_google_calendar_event(meetingEvent.google_calendar_event_id)
     
     # Decrease in 1 the number of meetings of the meeting type
-    odoo_meetings_meeting_type = http.request.env['odoo_meetings.meeting_type'].search([
+    odoo_meetings_meeting_type = http.request.env['odoo_meetings.meeting_type'].sudo().search([
         ['id', '=', meetingEvent.meeting_type.id]
     ])
 
     odoo_meetings_meeting_type.write({ 'num_meetings': odoo_meetings_meeting_type.num_meetings - 1 })
     
-    meeting_event = http.request.env['odoo_meetings.meeting_event'].search([
+    meeting_event = http.request.env['odoo_meetings.meeting_event'].sudo().search([
         ['id', '=', meetingEvent.id]
     ])
     # Remove event from meeting_event & calendar_event tables

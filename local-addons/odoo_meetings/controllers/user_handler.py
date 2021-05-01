@@ -15,7 +15,7 @@ def get_resource_resource(odoo_meetings_meeting_type):
         meeting_type_employees_id_list.append(employee.id)
 
     # Get the info of the resource table of the employees above
-    resource_resource = http.request.env['resource.resource'].search([
+    resource_resource = http.request.env['resource.resource'].sudo().search([
         ['id', 'in', meeting_type_employees_id_list]
     ])
 
@@ -28,7 +28,7 @@ def get_resource_calendar_attendance_sorted(resource_resource):
         resource_calendar_attendance_id_list.append(res.calendar_id.id)
 
     # Type of working hours from the resource_calendar_attendance table
-    resource_calendar_attendance = http.request.env['resource.calendar.attendance'].search([
+    resource_calendar_attendance = http.request.env['resource.calendar.attendance'].sudo().search([
         ['calendar_id', 'in', resource_calendar_attendance_id_list]
     ])
 
@@ -195,7 +195,7 @@ def get_first_available_employee(employee_attendance_order, resource_resource, r
 def is_available(res_users_id, date_selected, time_selected, meetingDuration):
     # Get all the calendar events of the employee in the date selected by the user
     today = datetime.datetime.today().date()
-    calendar_event = http.request.env['calendar.event'].search([
+    calendar_event = http.request.env['calendar.event'].sudo().search([
         ['start_date', '=', date_selected],
         ['user_id', '=', res_users_id]
     ])
