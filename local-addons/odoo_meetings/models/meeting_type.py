@@ -14,7 +14,7 @@ class MeetingType(models.Model):
         ('google_meet', 'Google Meet'),
     ], default='google_meet', required=True, string="Localización *")
     address = fields.Char(
-        string="Dirección", help="Es la ubicación que se le mostrará al usuario. Puedes poner Google Meet, videoconferencia, una dirección física...", required=True)
+        string="Dirección *", help="Es la ubicación que se le mostrará al usuario. Puedes poner Google Meet, videoconferencia, una dirección física...", required=True)
     description = fields.Char(string="Descripción *", required=True)
     employees = fields.Many2many(
         'hr.employee.public', string="Empleado", relation="odoo_meetings_meeting_type_employee_rel")
