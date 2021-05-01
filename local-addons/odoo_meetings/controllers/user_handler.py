@@ -77,8 +77,8 @@ def get_availability(resource_resource, resource_calendar_attendance_sorted, mee
         calendar_id.append(calendar.calendar_id.id)
         dayofweek.append(calendar.dayofweek)
         type_name.append(calendar.name)
-        print(calendar.calendar_id.name, "\t", calendar.name,
-                "\t", calendar.hour_from, " - ", calendar.hour_to)
+        # print(calendar.calendar_id.name, "\t", calendar.name,
+                # "\t", calendar.hour_from, " - ", calendar.hour_to)
 
     # Create dictionary with all needed data
     myDict["calendar_id"] = calendar_id
