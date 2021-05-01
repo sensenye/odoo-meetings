@@ -98,7 +98,7 @@
             <input type="hidden" name="meetingDescription" t-att-value="meetingDescription"/>
             <input type="hidden" name="meetingLocation" t-att-value="meetingLocation"/>
             <input type="hidden" name="meetingAddress" t-att-value="meetingAddress"/>
-            <input class="btn btn-secondary" type="button" value="Volver" onclick="history.back()" />
+            <input class="btn btn-secondary" type="button" value="Volver" onclick="location.href='/odoo-meetings'" />
             <button type="submit" class="btn btn-primary">Confirmar reunión</button>
           </form>
         </div>
