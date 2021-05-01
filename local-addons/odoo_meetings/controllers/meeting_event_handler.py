@@ -55,15 +55,15 @@ def meeting_event_submit(kw):
     # with open('meeting_event_handler.txt', 'w') as f:
         # Change the standard output to the file we created.
         # sys.stdout = f
-    print('\n', employee_attendance_order)
-    print('\n', selectedTime)
-    print('\n', selectedDay)
+    # print('\n', employee_attendance_order)
+    # print('\n', selectedTime)
+    # print('\n', selectedDay)
 
     # Get the ID of the first employee available
     assigned_employee_id = user_handler.get_first_available_employee(
         employee_attendance_order, resource_resource, resource_calendar_attendance_sorted, selectedDate, selectedDay, selectedTime, meetingDuration)
-    print('\n', '\n', 'assigned_employee_id',
-            '\n', assigned_employee_id)
+    # print('\n', '\n', 'assigned_employee_id',
+    #         '\n', assigned_employee_id)
 
     if -1 == assigned_employee_id:  # No employees available
         return http.request.render('odoo_meetings.form_failure', {})
@@ -81,12 +81,12 @@ def meeting_event_submit(kw):
     # The user login info is stored on the res_users_id
     res_users_id = user_handler.get_res_users_id(
         assigned_employee_id, resource_resource)
-    print('\n\n\n res_users_id: \n', res_users_id)
+    # print('\n\n\n res_users_id: \n', res_users_id)
 
     # A partner is a employee registered on the website (it has an account and password to access back office).
     partner_id = user_handler.get_partner_id(
         assigned_employee_id, resource_resource)
-    print('\n\n\n partner_id: \n', partner_id)
+    # print('\n\n\n partner_id: \n', partner_id)
 
     # Get date time with the format '%Y-%m-%d %H:%M:%S'
     start_time = kw.get('time-select') + ':00'
@@ -98,7 +98,7 @@ def meeting_event_submit(kw):
     end_date_time_str = kw.get('date') + ' ' + end_time
     end_date_time_obj = user_handler.time_to_utc(end_date_time_str)
 
-    print('timestamp: \n', start_date_time_obj, ' - ', end_date_time_obj)
+    # print('timestamp: \n', start_date_time_obj, ' - ', end_date_time_obj)
 
     # Save meeting event to db
     meeting = http.request.env['odoo_meetings.meeting_event'].sudo().create({

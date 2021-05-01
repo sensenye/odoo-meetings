@@ -87,16 +87,16 @@ def get_availability(resource_resource, resource_calendar_attendance_sorted, mee
     myDict["hour_from"] = hour_from
     myDict["hour_to"] = hour_to
 
-    print("\n", myDict)
+    # print("\n", myDict)
 
     # Create dataframe from Pandas library
     df = pandas.DataFrame(myDict)
 
-    print("\n", df)
+    # print("\n", df)
 
     df_dayofweek = df.groupby("dayofweek")
-    print("\n", df_dayofweek.first())
-    print("\n", df_dayofweek.get_group('0'))
+    # print("\n", df_dayofweek.first())
+    # print("\n", df_dayofweek.get_group('0'))
 
     # Get min hour from and max hour to for each type and for each day. This will be the availability of the entire team
     df_min_hour_from_by_type = df.groupby(
@@ -108,25 +108,25 @@ def get_availability(resource_resource, resource_calendar_attendance_sorted, mee
     list_min_hour_from_by_type = df_min_hour_from_by_type.values.tolist()
     list_max_hour_to_by_type = df_max_hour_to_by_type.values.tolist()
 
-    print("\ndf_min_hour_from_by_type \n", df_min_hour_from_by_type)
-    print("\nlist_min_hour_from_by_type \n",
-            list_min_hour_from_by_type)
-    print("\ndf_max_hour_to_by_type \n", df_max_hour_to_by_type)
-    print("\nlist_max_hour_to_by_type \n", list_max_hour_to_by_type)
+    # print("\ndf_min_hour_from_by_type \n", df_min_hour_from_by_type)
+    # print("\nlist_min_hour_from_by_type \n",
+    #         list_min_hour_from_by_type)
+    # print("\ndf_max_hour_to_by_type \n", df_max_hour_to_by_type)
+    # print("\nlist_max_hour_to_by_type \n", list_max_hour_to_by_type)
 
     # Add min hour from and max hour to to the list
     for min_value, max_value in zip(list_min_hour_from_by_type, list_max_hour_to_by_type):
         availability.append(min_value)
         availability.append(max_value)
 
-    print("\n\nAVAILABILITY:\n", availability)
+    # print("\n\nAVAILABILITY:\n", availability)
 
-    print("\n\nDAYS:\n", myDict["dayofweek"])
+    # print("\n\nDAYS:\n", myDict["dayofweek"])
 
     # Get unique values of dayofweek
     unique_dayofweek = df.groupby(
         "dayofweek").dayofweek.min().values.tolist()
-    print("\n\nDAYS:\n", unique_dayofweek)
+    # print("\n\nDAYS:\n", unique_dayofweek)
 
     # Save availability on a dictionary. Each key will represent a day (0 will be monday, 1 tuesday and so on until 6 which will be sunday) and it will store a list with the availability. The format will be:
     # availabilityDict {
@@ -148,7 +148,7 @@ def get_availability(resource_resource, resource_calendar_attendance_sorted, mee
                 availabilityDict[day] = hours_per_day
                 break
 
-    print("\n\nAVAILABILITY DICTIONARY:\n", availabilityDict)
+    # print("\n\nAVAILABILITY DICTIONARY:\n", availabilityDict)
     # for a in availabilityDict:
     #     for b in a[b]
     #     print("\n\n", b)
@@ -166,7 +166,7 @@ def get_hours(min_value, max_value, duration):
     while value <= max_value:
         hours.append(decimal_to_time(value))
         value += (duration / 60)
-    print(hours)
+    # print(hours)
         # sys.stdout = original_stdout
     return hours
 
@@ -175,14 +175,14 @@ def get_first_available_employee(employee_attendance_order, resource_resource, r
     for employee_id in employee_attendance_order:
         for res in resource_resource:
             if (employee_id == res.id):  # Get employee
-                print('\n', res.id, '\t', res.name)
+                # print('\n', res.id, '\t', res.name)
                 for calendar in resource_calendar_attendance_sorted:
                     # Get working type
                     if (calendar.calendar_id.id == res.calendar_id.id):
                         # Check if employee is working on the day and time selected by user
                         if (int(calendar.dayofweek) == int(selectedDay) and calendar.hour_from <= selectedTime <= calendar.hour_to):
-                            print(calendar.dayofweek, "\t", calendar.name,
-                                  "\t", calendar.hour_from, " - ", calendar.hour_to)
+                            # print(calendar.dayofweek, "\t", calendar.name,
+                                #   "\t", calendar.hour_from, " - ", calendar.hour_to)
 
                             res_users_id = get_res_users_id(
                                 employee_id, resource_resource)
@@ -203,17 +203,17 @@ def is_available(res_users_id, date_selected, time_selected, meetingDuration):
     start_time_selected_decimal = time_selected
     end_time_selected_decimal = start_time_selected_decimal + \
         float(meetingDuration)/60
-    print('\n\n', 'Time selected by user:',
-          start_time_selected_decimal, ' - ', end_time_selected_decimal)
+    # print('\n\n', 'Time selected by user:',
+        #   start_time_selected_decimal, ' - ', end_time_selected_decimal)
 
     # Check if the employee is available in the date and time selected by user
     for event in calendar_event:
         event_start_time_decimal = local_time_decimal(event.start)
         event_end_time_decimal = local_time_decimal(event.stop)
         # print(event.start.date(), ' | ', local_time_decimal(event.start), ' - ', local_time_decimal(event.stop))
-        print(event.start.date(), ' | ', event_start_time_decimal,
-              ' - ', event_end_time_decimal)
-        print(event.partner_id.name, '\n')
+        # print(event.start.date(), ' | ', event_start_time_decimal,
+            #   ' - ', event_end_time_decimal)
+        # print(event.partner_id.name, '\n')
         if (start_time_selected_decimal > event_end_time_decimal or end_time_selected_decimal < event_start_time_decimal):
             continue # Need to check all events
         else:
